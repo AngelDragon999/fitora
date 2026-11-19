@@ -37,26 +37,38 @@ Le funzionalità elencate sono in fase di definizione: consultare il PRD e lo Sc
 
 ## Documentazione
 
-| File | Descrizione |
+| Documento | Descrizione |
 |---|---|
-| [PRODUCT_VISION.md](PRODUCT_VISION.md) | Visione, problema, destinatari e obiettivi del prodotto. |
-| [PRD.md](PRD.md) | Requisiti funzionali e non funzionali, regole di business, criteri di accettazione e questioni aperte. |
-| [SCOPE.md](SCOPE.md) | Perimetro candidato dell'MVP e funzionalità rinviate. |
-| [GLOSSARY.md](GLOSSARY.md) | Terminologia condivisa del progetto. |
+| [PRODUCT_VISION.md](docs/product/PRODUCT_VISION.md) | Visione del prodotto |
+| [PRD.md](docs/product/PRD.md) | Requisiti del prodotto |
+| [SCOPE.md](docs/product/SCOPE.md) | Perimetro dell'MVP |
+| [GLOSSARY.md](docs/product/GLOSSARY.md) | Glossario |
+| [DECISIONS_AND_OPEN_QUESTIONS.md](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md) | Decisioni e questioni aperte |
 
 ## Struttura del repository prevista
 
 ```text
-fitora/
-├── frontend/
-├── backend/
+Fitora/
+|
+├──backend/
+|
+├──frontend/
+│
 ├── docs/
-│   ├── PRODUCT_VISION.md
-│   ├── PRD.md
-│   ├── SCOPE.md
-│   └── GLOSSARY.md
-├── README.md
-└── .gitignore
+│   ├── product/
+│   │   ├── PRODUCT_VISION.md
+│   │   ├── PRD.md
+│   │   ├── SCOPE.md
+│   │   └── GLOSSARY.md
+│   │
+│   ├── project/
+│   │   └── DECISIONS_AND_OPEN_QUESTIONS.md
+│   │
+│   └── architecture/
+│       └── .gitkeep
+│
+├── .gitignore
+└── README.md
 ```
 
 La struttura è indicativa e potrà cambiare dopo la progettazione dell'architettura.
