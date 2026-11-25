@@ -2,208 +2,330 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.1 — Draft |
-| Data | 17 novembre 2026 |
-| Stato | Bozza: requisiti e regole da validare |
+| Versione | 0.2 — Draft aggiornato |
+| Data aggiornamento | 25 novembre 2026 |
+| Stato | Requisiti aggiornati sulla base della discovery; restano questioni aperte da validare |
 | Product owner | Da assegnare |
-| Piattaforma | Gem Space Mini App (integrazione da validare) |
+| Canale iniziale | Gem Space Mini App |
+| Nome prodotto | Fitora è un codename temporaneo |
 
-> **Nota sullo stato dei requisiti:** il documento distingue le decisioni già espresse durante la discovery dalle proposte e dai dettagli ancora da definire. Un requisito non va considerato definitivo solo perché è presente in questa bozza.
+> **Come leggere questo documento**
+>
+> - **Confermato:** decisione già presa durante la discovery.
+> - **Proposta da validare:** raccomandazione utile a completare la specifica, non ancora approvata.
+> - **TBD / Aperto:** informazione o regola che deve essere decisa prima dell'implementazione interessata.
+>
+> Le scelte tecniche non devono essere dedotte automaticamente dai requisiti. L'architettura e il modello dati saranno definiti nella fase successiva.
 
 ## 1. Introduzione
 
-Fitora è una piattaforma gestionale multi-tenant per palestre e centri fitness. La palestra utilizza gli strumenti amministrativi; gli iscritti utilizzano una mini-app per consultare e prenotare le attività. La piattaforma deve consentire a più strutture indipendenti di operare nello stesso sistema mantenendo separati i rispettivi dati.
+Fitora è una piattaforma gestionale multi-tenant per palestre e centri fitness. La palestra utilizza gli strumenti amministrativi; gli iscritti utilizzano un'interfaccia dedicata, inizialmente una Gem Space Mini App, per consultare e prenotare le attività.
+
+La piattaforma deve consentire a più palestre indipendenti di operare nello stesso sistema mantenendo separati i rispettivi dati e permessi. Una stessa identità utente può essere associata a più palestre tramite associazioni distinte (`GymMembership`).
 
 ## 2. Obiettivi
 
-- Centralizzare la gestione di palestre, iscritti, istruttori, lezioni, prenotazioni, presenze e abbonamenti.
+- Centralizzare la gestione di palestre, iscritti, istruttori, corsi, lezioni, prenotazioni, presenze e abbonamenti.
 - Ridurre il lavoro manuale legato alla pianificazione e alla gestione delle lezioni.
 - Offrire agli iscritti un modo semplice per consultare il calendario e prenotare.
-- Applicare in modo coerente le regole di capienza e cancellazione.
-- Mantenere isolati i dati di ogni palestra.
+- Applicare in modo coerente le regole di capienza, cancellazione, lista d'attesa e consumo dei crediti.
+- Consentire a ciascuna palestra di configurare i propri piani di abbonamento.
+- Mantenere isolati i dati e le autorizzazioni di ogni palestra.
 
 ## 3. Utenti e stakeholder
 
 | Attore | Descrizione | Stato |
 |---|---|---|
-| Super Admin | Gestisce la piattaforma nel suo complesso e le palestre registrate. | Ruolo proposto e accettato come base; permessi da dettagliare. |
-| Gym Admin | Gestisce la propria palestra, gli utenti e la configurazione operativa. | Ruolo proposto e accettato come base; permessi da dettagliare. |
-| Instructor | Gestisce o conduce le lezioni e partecipa alla gestione delle presenze. | Ruolo proposto e accettato come base; permessi da dettagliare. |
-| Member | Iscritto alla palestra, consulta e prenota le lezioni. | Ruolo proposto e accettato come base; permessi da dettagliare. |
+| Super Admin | Gestisce la piattaforma nel suo complesso e il ciclo di vita delle palestre. | Ruolo confermato; perimetro operativo dettagliato da validare. |
+| Gym Admin | Gestisce una specifica palestra, gli utenti e la configurazione operativa. | Ruolo confermato; matrice permessi proposta più avanti e da validare. |
+| Instructor | Istruttore associato a una palestra, conduce le lezioni e registra le presenze autorizzate. | Ruolo confermato; permessi ulteriori da validare. |
+| Member | Iscritto a una o più palestre; consulta il calendario e gestisce le proprie prenotazioni. | Ruolo confermato. |
 
-Le autorizzazioni dovranno essere contestuali alla palestra. La stessa identità potrebbe, in futuro, avere rapporti differenti con più strutture: il modello dovrà evitare di vincolare necessariamente ogni utente a una sola palestra.
+Le autorizzazioni devono essere contestuali alla palestra. I ruoli assegnati a un utente nell'ambito di una palestra non devono attribuire automaticamente gli stessi privilegi presso un'altra palestra. Il ruolo Super Admin è invece globale.
 
 ## 4. Ambito del prodotto
 
 ### 4.1 Moduli funzionali previsti
 
 1. Gestione delle palestre (tenant).
-2. Gestione utenti e ruoli.
-3. Gestione istruttori.
-4. Gestione corsi e lezioni programmate.
+2. Gestione identità, associazioni `GymMembership` e ruoli.
+3. Gestione degli iscritti e degli istruttori.
+4. Gestione dei corsi e delle lezioni programmate.
 5. Calendario delle lezioni.
 6. Prenotazioni, cancellazioni e lista d'attesa.
 7. Gestione delle presenze e delle assenze.
-8. Definizione delle tipologie di abbonamento e assegnazione agli iscritti.
+8. Definizione dei piani di abbonamento e assegnazione degli abbonamenti agli iscritti.
+9. Autenticazione tramite Gem Space e autorizzazione applicativa Fitora.
 
-### 4.2 Fuori dall'ambito iniziale o da valutare
+### 4.2 Fuori dall'ambito dell'MVP
 
-- Check-in tramite QR code.
+- Check-in e check-out tramite QR code.
 - Sincronizzazione automatica con il calendario nativo del telefono.
-- Pagamenti online, fatturazione e generazione di ricevute.
-- Notifiche push o messaggistica, oltre alle capacità effettivamente verificate della piattaforma.
+- Pagamenti online, gestione transazioni, fatture e ricevute.
+- Rinnovi automatici, sospensioni e proroghe degli abbonamenti.
+- Inviti agli iscritti tramite link, salvo diversa decisione successiva.
+- Notifiche push, campagne e messaggistica avanzata, finché capacità e integrazioni non siano verificate.
 - Analisi avanzate, dashboard e reportistica evoluta.
+- App native separate per iOS e Android: il canale iniziale previsto è la Gem Space Mini App.
 
-Queste voci sono candidate per versioni successive; la loro priorità sarà rivalutata dopo la validazione dell'MVP.
+La lista d'attesa richiede comunque che l'offerta del posto e la relativa scadenza siano visibili all'iscritto. Il canale concreto di avviso (ad esempio notifica in-app, push o altro canale supportato) è ancora da definire e costituisce una dipendenza da risolvere prima del rilascio.
 
 ## 5. Requisiti funzionali
 
-Le priorità utilizzate sono: **Must** (necessario per il flusso MVP), **Should** (importante, da pianificare), **Could** (facoltativo o successivo). Le priorità sono proposte e dovranno essere confermate durante la definizione dello scope.
+Le priorità sono:
+- **Must:** necessario per il flusso MVP.
+- **Should:** importante, da pianificare se compatibile con tempi e dipendenze.
+- **Could:** possibile evoluzione.
+- **Out of scope:** escluso dall'MVP.
 
 ### 5.1 Multi-tenancy e gestione palestra
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-TEN-001 | Il sistema deve supportare più palestre indipendenti nella stessa piattaforma. | Must | Decisione confermata. |
-| FR-TEN-002 | Il sistema deve associare i dati gestionali alla palestra di appartenenza. | Must | Necessario per l'isolamento dei tenant. |
-| FR-TEN-003 | Un utente non autorizzato di una palestra non deve poter leggere o modificare dati di un'altra palestra. | Must | Da tradurre in controlli backend e test. |
-| FR-TEN-004 | Il Super Admin deve poter amministrare le palestre registrate. | Should | Perimetro esatto da definire. |
+| FR-TEN-001 | Il sistema deve supportare più palestre indipendenti nella stessa piattaforma. | Must | Confermato. |
+| FR-TEN-002 | I dati gestionali devono essere associati alla palestra di appartenenza. | Must | Confermato. |
+| FR-TEN-003 | Un utente di una palestra non deve poter leggere o modificare dati di un'altra palestra senza un'autorizzazione globale esplicita. | Must | Confermato; da tradurre in controlli backend e test. |
+| FR-TEN-004 | Il Super Admin deve poter gestire il ciclo di vita delle palestre registrate. | Must | Direzione funzionale; operazioni e processo di provisioning da validare. |
+| FR-TEN-005 | Il sistema deve consentire di associare una stessa identità a più palestre tramite `GymMembership` distinte. | Must | Confermato. |
 
-### 5.2 Utenti e ruoli
+### 5.2 Utenti, associazioni e ruoli
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-USR-001 | Il sistema deve supportare i ruoli Super Admin, Gym Admin, Instructor e Member. | Must | Ruoli di base concordati; matrice permessi da completare. |
-| FR-USR-002 | Il Gym Admin deve poter gestire gli utenti appartenenti alla propria palestra, nei limiti dei permessi assegnati. | Must | Dettagli da definire. |
-| FR-USR-003 | Il sistema deve associare un iscritto alla palestra di riferimento. | Must | Il modello deve poter supportare più associazioni per utente, se richiesto. |
-| FR-USR-004 | Il sistema deve consentire di consultare e aggiornare i dati di profilo autorizzati. | Should | Campi e responsabilità da definire. |
+| FR-USR-001 | Il sistema deve supportare i ruoli Super Admin, Gym Admin, Instructor e Member. | Must | Ruoli base confermati. |
+| FR-USR-002 | Il Gym Admin deve poter gestire gli iscritti della propria palestra entro i permessi assegnati. | Must | Confermato per la registrazione manuale degli iscritti; operazioni ulteriori da dettagliare. |
+| FR-USR-003 | Un'identità utente deve poter avere una o più associazioni `GymMembership`, ciascuna con ruolo e stato nel contesto della relativa palestra. | Must | Confermato il multi-gym; stati e vincoli puntuali da definire. |
+| FR-USR-004 | Il sistema deve consentire la consultazione e l'aggiornamento dei dati di profilo autorizzati. | Must | Campi, titolarità e possibilità di modifica da definire; applicare minimizzazione dei dati. |
+| FR-USR-005 | Il Gym Admin deve poter creare manualmente un profilo Member nella propria palestra. | Must | Confermato per l'MVP. |
+| FR-USR-006 | Il sistema deve collegare il profilo Fitora creato dal Gym Admin all'identità Gem Space dell'iscritto. | Must | Obiettivo confermato; procedura sicura di associazione ancora TBD. |
+
+#### 5.2.1 Matrice iniziale dei permessi — proposta da validare
+
+La seguente matrice è una base di lavoro, non una decisione definitiva sui permessi.
+
+| Operazione | Super Admin | Gym Admin | Instructor | Member |
+|---|---|---|---|---|
+| Gestire le palestre e il provisioning | Sì, globale | No | No | No |
+| Consultare i dati operativi di una palestra | Solo secondo una policy globale da definire | Sì, propria palestra | Dati necessari alle lezioni assegnate | Solo i propri dati e le informazioni pubblicate |
+| Creare/modificare corsi e lezioni | Supporto globale da definire | Sì, propria palestra | TBD | No |
+| Gestire iscritti e istruttori | No, salvo policy globale | Sì, propria palestra | No, salvo futura delega | Gestione del solo profilo personale da definire |
+| Creare/assegnare piani di abbonamento | No, salvo amministrazione piattaforma | Sì, propria palestra | No | No |
+| Consultare e gestire le proprie prenotazioni | No | Consultazione/gestione per la palestra | Consultazione delle lezioni assegnate | Sì, proprie prenotazioni |
+| Entrare/uscire dalla lista d'attesa e confermare un'offerta | No | Consultazione/gestione per la palestra da definire | No | Sì, per sé |
+| Registrare presenza/assenza | No, salvo supporto globale autorizzato | Sì, propria palestra | Sì, per le lezioni autorizzate | No |
+| Consultare il proprio abbonamento | No | Sì, per gli iscritti della propria palestra | No, salvo delega | Sì |
+
+> **Vincolo di sicurezza:** nessuna schermata o controllo frontend sostituisce l'autorizzazione backend. La palestra attiva deve essere ricavata da un contesto autenticato e autorizzato, non accettata ciecamente da un parametro fornito dal client.
 
 ### 5.3 Corsi, lezioni e istruttori
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-CLS-001 | Un utente autorizzato della palestra deve poter creare e modificare le lezioni. | Must | Ruoli autorizzati da specificare. |
-| FR-CLS-002 | Una lezione deve essere associata a una palestra. | Must | Isolamento multi-tenant. |
-| FR-CLS-003 | Una lezione deve contenere almeno attività/corso, data, orario, istruttore e capienza massima. | Must | Campi iniziali proposti; eventuali altri campi da definire. |
-| FR-CLS-004 | Il sistema deve mostrare agli iscritti le lezioni disponibili della propria palestra. | Must | Canale e filtri da definire. |
+| FR-CLS-001 | Un utente autorizzato della palestra deve poter creare e modificare le lezioni. | Must | Gym Admin previsto; permessi di creazione/modifica dell'Instructor da validare. |
+| FR-CLS-002 | Ogni corso e lezione devono essere associati a una palestra. | Must | Confermato dal modello multi-tenant. |
+| FR-CLS-003 | Una lezione deve contenere almeno attività/corso, data, orario di inizio e fine o durata, istruttore e capienza massima. | Must | Campi minimi proposti; durata vs orario finale da uniformare nel design. |
+| FR-CLS-004 | Il sistema deve mostrare agli iscritti le lezioni pubblicate e disponibili della propria palestra. | Must | Confermato come flusso. |
+| FR-CLS-005 | Il sistema dovrebbe supportare la programmazione ricorrente delle lezioni. | TBD | Da decidere se ricorrenza e serie di lezioni sono necessarie nell'MVP; vedi Q-009. |
 
-### 5.4 Calendario e prenotazioni
+Distinzione terminologica: un `Course` rappresenta la tipologia di attività (ad esempio yoga); una `Lesson` è una singola occorrenza programmata nel calendario. La gestione delle serie ricorrenti non è ancora confermata.
+
+### 5.4 Calendario, prenotazioni e lista d'attesa
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-BKG-001 | L'iscritto deve poter consultare il calendario e selezionare una data. | Must | Decisione confermata. |
-| FR-BKG-002 | L'iscritto deve poter prenotare una lezione disponibile tramite un'azione esplicita (es. pulsante “Prenota”). | Must | Decisione confermata. |
-| FR-BKG-003 | Il sistema deve impedire prenotazioni oltre la capienza massima della lezione. | Must | Decisione confermata. Implementazione concorrente da progettare. |
-| FR-BKG-004 | L'iscritto deve poter annullare una prenotazione fino a 24 ore prima dell'inizio della lezione. | Must | Interpretazione della regola da confermare formalmente. |
-| FR-BKG-005 | Oltre il termine di cancellazione, la prenotazione deve essere trattata secondo la regola di consumo/penalità definita dalla palestra. | Must | Intenzione espressa; effetto preciso su abbonamento da definire. |
-| FR-BKG-006 | Se un posto si libera, il sistema deve poter consentire l'ingresso a un iscritto in lista d'attesa. | Should | Lista d'attesa richiesta; ordine, promozione e scadenze da definire. |
-| FR-BKG-007 | Il sistema deve impedire allo stesso iscritto di creare prenotazioni duplicate per la stessa lezione. | Must | Proposta tecnica da confermare. |
-| FR-BKG-008 | Il sistema dovrebbe consentire la sincronizzazione con il calendario personale del dispositivo. | Could | Non inclusa nell'MVP finché la fattibilità nella Mini App non è verificata. |
+| FR-BKG-001 | L'iscritto deve poter consultare il calendario e selezionare una data. | Must | Confermato. |
+| FR-BKG-002 | L'iscritto deve poter prenotare una lezione disponibile tramite un'azione esplicita. | Must | Confermato. |
+| FR-BKG-003 | Il sistema deve impedire prenotazioni oltre la capienza massima, anche in presenza di richieste concorrenti. | Must | Regola confermata; implementazione e test concorrenti da progettare. |
+| FR-BKG-004 | L'iscritto deve poter cancellare una prenotazione in qualsiasi momento prima dell'inizio della lezione; il trattamento economico/crediti dipende dalla soglia delle 24 ore. | Must | La cancellazione tardiva è consentita; vedi BR-003/004. |
+| FR-BKG-005 | Il sistema deve applicare le regole di consumo dell'abbonamento in caso di cancellazione tardiva o No-show. | Must | Confermato per gli abbonamenti a crediti; effetto sui piani temporali da definire. |
+| FR-BKG-006 | Il sistema deve gestire una lista d'attesa FIFO e proporre il posto liberato al primo iscritto in coda. | Must | Confermato per l'MVP. |
+| FR-BKG-007 | L'iscritto deve poter confermare o rifiutare l'offerta entro 30 minuti; in assenza di conferma entro il termine, l'offerta scade e il posto viene proposto al successivo. | Must | Confermato per l'MVP; canale di notifica/avviso da definire. |
+| FR-BKG-008 | Il sistema dovrebbe impedire allo stesso iscritto di effettuare prenotazioni duplicate per la stessa lezione. | Must | Regola proposta da validare; raccomandata per integrità operativa. |
+| FR-BKG-009 | Il sistema potrebbe consentire la sincronizzazione con il calendario personale del dispositivo. | Out of scope | Non inclusa nell'MVP; fattibilità Mini App da verificare per una versione successiva. |
+
+Regole operative della lista d'attesa:
+- L'ordine è FIFO, basato sul momento di ingresso nella lista.
+- Quando si libera un posto, il sistema crea un'offerta per il primo iscritto eleggibile.
+- L'offerta deve avere una scadenza di 30 minuti.
+- Durante la finestra di conferma il posto è temporaneamente riservato all'iscritto che ha ricevuto l'offerta, così da non poter essere assegnato contemporaneamente a un altro iscritto.
+- Se l'iscritto rifiuta o non conferma entro la scadenza, la riserva temporanea viene rilasciata e il sistema passa al successivo.
+- Il credito di un abbonamento a crediti non viene riservato per il solo fatto di essere in lista d'attesa; viene riservato quando l'iscritto conferma e la prenotazione diventa effettiva.
+- Il sistema deve ricontrollare capienza e idoneità dell'abbonamento nel momento della conferma.
+
+L'ultimo punto è una regola tecnica proposta per evitare che una promozione superi la capienza o utilizzi un abbonamento non più valido; il comportamento preciso in caso di abbonamento non idoneo va validato.
 
 ### 5.5 Presenze e assenze
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-ATT-001 | La palestra deve poter consultare gli iscritti prenotati a una lezione e il relativo stato. | Must | Da dettagliare. |
-| FR-ATT-002 | Il sistema deve supportare la registrazione della presenza e dell'assenza. | Must | Modalità e ruolo autorizzato da confermare. |
-| FR-ATT-003 | Il sistema deve distinguere la presenza fisica dall'eventuale consumo della lezione dovuto a una cancellazione tardiva o mancata disdetta. | Must | Distinzione necessaria per evitare dati ambigui. |
-| FR-ATT-004 | Il check-in tramite QR code potrà essere introdotto in una versione successiva. | Could | Esplicitamente rinviato. |
+| FR-ATT-001 | La palestra deve poter consultare l'elenco degli iscritti prenotati a una lezione e il relativo stato. | Must | Previsto. |
+| FR-ATT-002 | Il sistema deve consentire la registrazione manuale di presenza e assenza da parte di Instructor autorizzati e Gym Admin della palestra. | Must | Decisione confermata. |
+| FR-ATT-003 | Il sistema deve distinguere la presenza fisica dall'eventuale consumo di un credito. | Must | Confermato come requisito di dominio. |
+| FR-ATT-004 | Ogni registrazione o modifica di presenza deve conservare almeno l'operatore e la data/ora dell'operazione. | Must | Proposta di audit trail da validare nel dettaglio; raccomandata. |
+| FR-ATT-005 | Il check-in tramite QR code potrà essere introdotto in una versione successiva. | Out of scope | Esplicitamente rinviato. |
+
+La presenza fisica e il consumo dell'abbonamento sono concetti distinti. Un No-show può comportare il consumo di un credito anche se l'esito della presenza è "assente".
 
 ### 5.6 Abbonamenti
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-MEM-001 | Ogni palestra deve poter definire le proprie tipologie di abbonamento. | Must | Decisione confermata: la palestra sceglie e configura i propri piani. |
-| FR-MEM-002 | Il sistema deve consentire di associare un piano a un iscritto. | Must | Funzionalità di base prevista. |
-| FR-MEM-003 | Il sistema deve registrare le informazioni essenziali dell'abbonamento assegnato, inclusi almeno piano e periodo di validità, se applicabile. | Must | Campi e regole da definire. |
-| FR-MEM-004 | Il sistema deve consentire di verificare lo stato dell'abbonamento dell'iscritto. | Must | Stati possibili da definire. |
-| FR-MEM-005 | Il sistema deve supportare piani a durata, a ingressi, a lezioni e/o illimitati. | TBD | Proposta da confermare: non ancora approvata dall'utente. |
-| FR-MEM-006 | Il sistema deve aggiornare il residuo di ingressi/lezioni quando una regola di consumo lo prevede. | TBD | Dipende dai tipi di piano e dalle regole di consumo. |
-| FR-MEM-007 | Il sistema può supportare sospensioni, rinnovi e proroghe degli abbonamenti. | Could | Da confermare. |
-| FR-MEM-008 | Il sistema può gestire pagamenti, fatture o ricevute. | Out of scope / TBD | Non è stata ancora presa una decisione. |
+| FR-MEM-001 | Ogni palestra deve poter definire le proprie tipologie di abbonamento. | Must | Confermato: configurazione indipendente per palestra. |
+| FR-MEM-002 | Il sistema deve consentire al Gym Admin di assegnare un piano a un iscritto della propria palestra. | Must | Previsto. |
+| FR-MEM-003 | Il sistema deve registrare per ogni abbonamento assegnato almeno il piano di riferimento e il periodo di validità. | Must | Le date sono necessarie per i piani temporali e per eventuali piani a crediti con scadenza. |
+| FR-MEM-004 | Il sistema deve consentire di verificare lo stato dell'abbonamento e la sua utilizzabilità al momento della prenotazione. | Must | Stati specifici e regole per scadenza da definire. |
+| FR-MEM-005 | Il sistema deve supportare abbonamenti temporali e abbonamenti a crediti. | Must | Decisione confermata per l'MVP. |
+| FR-MEM-006 | Per gli abbonamenti a crediti, il sistema deve distinguere crediti disponibili, riservati e consumati. | Must | Decisione confermata. |
+| FR-MEM-007 | Il sistema può supportare sospensioni, rinnovi automatici e proroghe. | Out of scope | Rinviati oltre l'MVP. |
+
+Modelli confermati:
+- **Temporale:** consente accesso alle lezioni senza un limite numerico durante il periodo di validità. Eventuali restrizioni per corso, fascia oraria o sede sono ancora da definire.
+- **A crediti:** mette a disposizione un numero definito di lezioni da utilizzare entro un periodo di validità/scadenza.
+
+Ciclo di vita dei crediti per i piani a crediti:
+1. Prenotazione confermata: un credito viene riservato.
+2. Partecipazione: il credito riservato diventa consumato.
+3. Cancellazione almeno 24 ore prima dell'inizio: il credito riservato viene restituito tra i disponibili.
+4. Cancellazione con meno di 24 ore prima dell'inizio: il credito viene consumato.
+5. No-show registrato: il credito viene consumato.
+6. Semplice ingresso in lista d'attesa: nessun credito viene riservato.
+7. Conferma di un'offerta di lista d'attesa: viene riservato un credito, se l'abbonamento è valido e dispone di credito disponibile.
+
+Per i piani temporali non esiste un contatore di crediti. L'effetto della cancellazione tardiva e del No-show su questi piani è ancora da definire: non si deve inventare una detrazione di crediti che il piano non possiede.
+
+Sono inoltre da definire:
+- Se un iscritto possa avere più abbonamenti attivi contemporaneamente nella stessa palestra.
+- Come viene scelto l'abbonamento da utilizzare se ne esiste più di uno valido.
+- Gli stati dell'abbonamento e il comportamento alle date di inizio e scadenza.
+- Le eventuali limitazioni per corso, sede o fascia oraria.
+
+### 5.7 Autenticazione e integrazione Gem Space
+
+| ID | Requisito | Priorità | Stato / Note |
+|---|---|---|---|
+| FR-AUTH-001 | Per l'MVP, Gem Space deve essere l'unico Identity Provider utilizzato per autenticare gli utenti. | Must | Decisione confermata. |
+| FR-AUTH-002 | Il backend deve verificare la validità e la firma del JWT ricevuto da Gem Space prima di riconoscere l'identità. | Must | Confermato come requisito di sicurezza; dettagli tecnici da verificare su documentazione ufficiale. |
+| FR-AUTH-003 | Fitora deve associare l'identità Gem Space a un'identità Fitora e alle relative `GymMembership`. | Must | Obiettivo confermato; procedura di linking ancora aperta. |
+
+Il README dello SDK fornito durante la discovery descrive le seguenti API:
+- `bridge.app.init()` per inizializzare/ottenere informazioni sul contesto applicativo, se necessario.
+- `bridge.profile.get()` per ottenere il profilo Gem Space, se necessario.
+- `bridge.auth.getToken()` per ottenere un JWT firmato e a breve durata.
+- `bridge.app.ready()` per comunicare che la Mini App è pronta.
+
+Il token deve essere trasmesso al backend e verificato lato server. Non si devono inventare issuer, audience, algoritmo, claim o URL delle chiavi: questi parametri devono essere ricavati dalla documentazione ufficiale Gem Space prima dell'implementazione.
+
+Per l'MVP non è previsto un login autonomo Fitora con username/password né un secondo Identity Provider.
+
+### 5.8 Notifiche e comunicazioni
+
+| ID | Requisito | Priorità | Stato / Note |
+|---|---|---|---|
+| FR-NOT-001 | Il sistema deve rendere visibile all'iscritto un'offerta di posto proveniente dalla lista d'attesa e la relativa scadenza. | Must | Necessario per il flusso di conferma da 30 minuti; modalità tecnica da definire. |
+| FR-NOT-002 | Il sistema può inviare notifiche push o messaggi esterni per prenotazioni, cancellazioni e offerte. | Out of scope / TBD | Non assumere che Gem Space supporti le capacità necessarie; verificare SDK e piattaforma. |
+
+La conferma entro 30 minuti è una regola funzionale approvata, ma non è ancora definito come l'iscritto venga avvisato in tempo utile. Questo è un punto bloccante per la progettazione completa del flusso di lista d'attesa.
 
 ## 6. Regole di business
 
 | ID | Regola | Stato |
 |---|---|---|
-| BR-001 | Una lezione ha una capienza massima. | Confermata. |
-| BR-002 | Le prenotazioni non possono superare la capienza massima. | Confermata. |
-| BR-003 | L'iscritto può annullare la prenotazione fino a 24 ore prima dell'inizio della lezione. | Interpretazione da confermare: chiarire la formula esatta della finestra temporale. |
-| BR-004 | Se la cancellazione avviene oltre il termine consentito, la lezione può essere conteggiata come utilizzata. | Intenzione espressa; confermare eccezioni e modalità di consumo. |
-| BR-005 | La lista d'attesa permette a un iscritto di subentrare quando un posto si libera. | Obiettivo confermato; priorità e automatismi da definire. |
-| BR-006 | Ogni palestra definisce le proprie tipologie di abbonamento. | Confermata. |
-| BR-007 | I dati di una palestra devono rimanere separati da quelli delle altre. | Confermata come requisito fondamentale del modello multi-tenant. |
+| BR-001 | Ogni lezione ha una capienza massima. | Confermata. |
+| BR-002 | Il numero di prenotazioni effettive non può superare la capienza massima. | Confermata; la consistenza sotto concorrenza deve essere testata. |
+| BR-003 | La cancellazione è gratuita rispetto al consumo di crediti se richiesta almeno 24 ore prima dell'inizio della lezione. | Confermata. |
+| BR-004 | La cancellazione è consentita anche a meno di 24 ore dall'inizio; per un abbonamento a crediti, il credito prenotato viene consumato. | Confermata. |
+| BR-005 | Ogni posto liberato può essere proposto al primo iscritto eleggibile in lista d'attesa, in ordine FIFO. | Confermata. |
+| BR-006 | L'offerta della lista d'attesa scade dopo 30 minuti (MVP); in caso di rifiuto o mancata conferma si passa al successivo. | Confermata. |
+| BR-007 | Ogni palestra definisce le proprie tipologie di abbonamento. | Confermata. |
+| BR-008 | I dati e i permessi di una palestra devono rimanere separati da quelli delle altre. | Confermata. |
+| BR-009 | La prenotazione confermata riserva un credito per un abbonamento a crediti. | Confermata. |
+| BR-010 | La cancellazione almeno 24 ore prima restituisce il credito riservato. | Confermata. |
+| BR-011 | La cancellazione tardiva o il No-show comportano il consumo del credito per un abbonamento a crediti. | Confermata. |
+| BR-012 | La partecipazione trasforma il credito riservato in credito consumato. | Confermata. |
+| BR-013 | Un semplice inserimento in lista d'attesa non riserva crediti; la riserva avviene alla conferma dell'offerta. | Confermata nel flusso concordato. |
+| BR-014 | Instructor autorizzati e Gym Admin possono registrare presenza/assenza nella palestra di appartenenza secondo i rispettivi permessi. | Confermata. |
+| BR-015 | La stessa identità può essere associata a più palestre tramite `GymMembership` distinte. | Confermata. |
+| BR-016 | Il Gym Admin crea manualmente il profilo dell'iscritto per la propria palestra; il linking con Gem Space avviene con una procedura da definire. | Prima parte confermata; procedura di linking aperta. |
+| BR-017 | Gem Space è l'unico Identity Provider dell'MVP; ruoli e autorizzazioni applicative sono gestiti da Fitora. | Confermata. |
+
+**Precisazione sul posto liberato:** una cancellazione, anche tardiva, libera il posto per una possibile assegnazione alla lista d'attesa. Il consumo del credito dell'iscritto che cancella e la disponibilità fisica del posto sono due aspetti distinti.
+
+**Precisazione sui piani temporali:** BR-004 e BR-011 definiscono il consumo per piani a crediti. L'eventuale penalità o conseguenza per i piani temporali in caso di cancellazione tardiva/No-show è TBD.
 
 ## 7. Requisiti non funzionali
 
-I seguenti requisiti sono obiettivi iniziali; i valori misurabili andranno definiti dopo aver chiarito utenti attesi e infrastruttura.
+I requisiti seguenti sono obiettivi iniziali. I valori quantitativi dovranno essere stabiliti quando saranno noti utenti attesi, infrastruttura e condizioni di rilascio.
 
-| ID | Requisito | Criterio da definire |
+| ID | Requisito | Criterio di verifica / Stato |
 |---|---|---|
-| NFR-001 | Sicurezza e autorizzazione server-side. | Modello di autenticazione, sessione, ruoli e test di accesso. |
-| NFR-002 | Isolamento dei dati tra tenant. | Test automatici per accessi cross-tenant in lettura e scrittura. |
-| NFR-003 | Consistenza delle prenotazioni in caso di richieste concorrenti. | Test concorrenti sull'ultimo posto disponibile. |
-| NFR-004 | Usabilità su dispositivi mobili e nel contenitore Gem Space. | Verifica su piattaforme e dimensioni supportate. |
-| NFR-005 | Manutenibilità ed estendibilità. | Struttura modulare, convenzioni e test. |
-| NFR-006 | Protezione dei dati personali. | Definire dati raccolti, finalità, conservazione, accessi e informativa con adeguata revisione. |
-| NFR-007 | Affidabilità e gestione degli errori. | Comportamento in caso di indisponibilità backend/SDK e retry. |
+| NFR-001 | Autenticazione e autorizzazione devono essere applicate lato backend. | Test di accesso autenticato/non autenticato e verifica dei ruoli. |
+| NFR-002 | Isolamento dei dati tra tenant. | Test automatici di lettura e scrittura cross-tenant. |
+| NFR-003 | Consistenza delle prenotazioni sotto concorrenza. | Test concorrenti sull'ultimo posto disponibile e sui crediti residui. |
+| NFR-004 | Protezione dei dati personali e minimizzazione. | Inventario dati, finalità, accessi, conservazione e informativa da definire con le parti competenti; non equivale a dichiarazione di conformità legale. |
+| NFR-005 | Manutenibilità ed estendibilità. | Struttura modulare, convenzioni condivise e test automatici. |
+| NFR-006 | Usabilità su dispositivi mobili nel contenitore Gem Space. | Verifica su dispositivi, viewport e versioni supportate. |
+| NFR-007 | Affidabilità e gestione degli errori. | Definire comportamento in caso di indisponibilità backend/SDK, scadenza token e retry. |
+| NFR-008 | Tracciabilità delle operazioni sensibili. | Registrazione dell'operatore e timestamp per modifiche rilevanti, con accesso ai log limitato. |
+| NFR-009 | Prestazioni adeguate al volume atteso. | Soglie e profilo di carico TBD dopo aver definito il contesto di utilizzo. |
 
-## 8. Autenticazione e integrazione Gem Space
-
-L'integrazione prevista utilizza `@gemspace/gem-bridge-sdk`. Il README del pacchetto fornito per la discovery descrive, tra le altre, queste API:
-
-- `bridge.app.init()` per ottenere informazioni sull'app e sul contesto della piattaforma.
-- `bridge.profile.get()` per ottenere il profilo dell'utente Gem Space.
-- `bridge.auth.getToken()` per ottenere un JWT firmato e a breve durata.
-- `bridge.app.ready()` come chiamata richiesta per comunicare che la mini-app è pronta.
-
-Il token dovrà essere inviato al backend e la sua firma verificata lato server. Il token è a breve durata e il client deve richiederne uno nuovo quando scade. I dettagli esatti di verifica (chiavi, algoritmo, issuer, audience e ulteriori claim attesi) devono essere verificati nella documentazione ufficiale di autenticazione prima dell'implementazione.
-
-L'identità Gem Space dovrà essere collegata a un'identità Fitora e alle relative associazioni con le palestre. Non si deve assumere che l'identificativo Gem Space contenga già il ruolo o il tenant Fitora.
-
-La sincronizzazione del calendario del telefono e le altre capacità native non sono confermate dal README SDK esaminato: vanno verificate separatamente e non sono prerequisiti dell'MVP.
-
-## 9. Criteri di accettazione iniziali dell'MVP
+## 8. Criteri di accettazione iniziali dell'MVP
 
 L'MVP potrà essere considerato dimostrabile quando:
 
-1. È possibile configurare almeno una palestra e i relativi utenti autorizzati.
-2. Un utente autorizzato può creare una lezione con data, orario, istruttore e capienza.
-3. Un iscritto associato alla palestra può visualizzare la lezione e prenotarla.
-4. Il sistema impedisce il superamento della capienza anche in presenza di richieste concorrenti.
-5. Il sistema applica la finestra di cancellazione concordata.
-6. La palestra può consultare prenotazioni e registrare la presenza/assenza con la modalità definita.
-7. È possibile creare una tipologia di abbonamento e associarla a un iscritto secondo le regole approvate.
-8. I test dimostrano che un tenant non può accedere ai dati di un altro tenant.
+1. È possibile predisporre almeno una palestra e un Gym Admin autorizzato.
+2. Il Gym Admin può creare un profilo Member e associarlo alla palestra.
+3. Un'identità Gem Space autenticata può essere collegata a un'identità Fitora tramite una procedura approvata e sicura.
+4. Un utente autorizzato può creare una lezione con corso/attività, data, orario, istruttore e capienza.
+5. Un iscritto associato alla palestra può consultare la lezione e prenotarla.
+6. Il sistema impedisce il superamento della capienza anche in presenza di richieste concorrenti.
+7. Il sistema applica correttamente la soglia delle 24 ore: esattamente 24 ore prima la cancellazione restituisce il credito; sotto le 24 ore il credito viene consumato per i piani a crediti.
+8. Una cancellazione libera il posto e attiva il flusso FIFO della lista d'attesa.
+9. L'offerta di lista d'attesa scade dopo 30 minuti se non confermata; il sistema passa al successivo.
+10. I crediti sono riservati alla prenotazione confermata e restituiti/consumati secondo le regole approvate.
+11. Instructor autorizzati e Gym Admin possono registrare presenza/assenza; l'operazione è tracciabile.
+12. È possibile configurare e assegnare un piano temporale e un piano a crediti.
+13. I test dimostrano che un tenant non può accedere ai dati di un altro tenant.
+14. I test verificano che un utente non possa utilizzare più volte lo stesso credito o occupare più posti per la stessa lezione in violazione delle regole approvate.
 
-Questi criteri dovranno essere aggiornati quando saranno definiti i dettagli ancora aperti.
+I criteri 3 e 8-9 dipendono dalla risoluzione rispettivamente del linking Gem Space e del canale di avviso dell'offerta della lista d'attesa.
 
-## 10. Assunzioni, dipendenze e vincoli
+## 9. Assunzioni, dipendenze e vincoli
 
-- Fitora è progettata come piattaforma multi-tenant.
-- Il canale iniziale previsto è una Gem Space Mini App.
-- La disponibilità e i limiti dell'SDK e del processo di pubblicazione devono essere verificati attraverso la documentazione ufficiale.
-- La sincronizzazione con calendari esterni non è ancora verificata.
-- Le regole di abbonamento non sono ancora sufficientemente dettagliate per fissare il modello dati definitivo.
-- La gestione dei pagamenti non è stata decisa.
+- Fitora è progettata come piattaforma multi-tenant; l'MVP può essere dimostrato inizialmente con una palestra, ma i confini tenant devono essere presenti fin dall'inizio.
+- Il canale applicativo iniziale è una Gem Space Mini App.
+- Gem Space è l'unico Identity Provider previsto per l'MVP.
+- La verifica JWT deve essere implementata sul backend, usando esclusivamente parametri e chiavi documentati ufficialmente.
+- L'identità Gem Space deve essere collegata a un'identità Fitora; il metodo è ancora da progettare.
+- La sincronizzazione con calendari esterni non è inclusa nell'MVP.
+- Pagamenti online, fatture e ricevute sono indicati come fuori ambito nella bozza Scope; la decisione commerciale va confermata con il cliente.
+- La configurabilità futura della finestra della lista d'attesa è un'evoluzione; nell'MVP si applicano 30 minuti.
+- Il nome Fitora è temporaneo.
 
-## 11. Questioni aperte da risolvere
+## 10. Questioni aperte
 
-1. I piani supportano durata, ingressi, lezioni e illimitato? Quali combinazioni sono ammesse?
-2. Gli abbonamenti hanno data di inizio/fine, quantità residua, fasce orarie o restrizioni per attività?
-3. Fitora gestisce solo lo stato degli abbonamenti o anche pagamenti, rinnovi e ricevute?
-4. Cosa succede esattamente se l'iscritto non disdice entro la scadenza: consumo automatico, penale o gestione manuale?
-5. La finestra “24 ore” significa cancellazione consentita fino a 24 ore prima dell'orario di inizio? Ci sono eccezioni decise dalla palestra?
-6. La lista d'attesa è FIFO? L'iscritto viene promosso automaticamente oppure riceve una finestra per confermare?
-7. Chi registra presenza e assenza: istruttore, Gym Admin o entrambi? La registrazione è manuale per l'MVP?
-8. Un iscritto può appartenere a più palestre contemporaneamente?
-9. Come vengono invitati o associati gli iscritti alla palestra e collegati al loro account Gem Space?
-10. Sono richieste lezioni ricorrenti, corsi con più sessioni o soltanto singole sessioni programmate?
-11. Quali statistiche, esportazioni e notifiche sono necessarie nel primo rilascio?
-12. Quali sono i limiti e le condizioni di pubblicazione e utilizzo della Mini App Gem Space?
+Le seguenti questioni non sono state ancora approvate come requisiti definitivi e devono rimanere tracciate nel registro decisionale.
 
-## 12. Cronologia delle revisioni
+| ID | Questione | Impatto | Quando risolvere |
+|---|---|---|---|
+| Q-002 | Confermare con il cliente che pagamenti online, fatture e ricevute restino fuori dall'MVP. | Scope, integrazioni, implicazioni amministrative. | Validazione scope. |
+| Q-003 | Definire i campi minimi, gli stati e le date di validità dei piani e degli abbonamenti assegnati. | Modello dati e regole di accesso. | Prima del database design. |
+| Q-008 | Definire il collegamento sicuro tra il profilo Fitora creato dal Gym Admin e l'identità Gem Space dell'iscritto. | Identity mapping, sicurezza e onboarding. | Prima dell'autenticazione end-to-end. |
+| Q-009 | Decidere se l'MVP gestisce solo lezioni singole o anche la creazione di serie ricorrenti. | Modello Course/Lesson, calendario e UX. | Prima del database design. |
+| Q-011 | Definire il canale che rende tempestivamente visibile un'offerta di lista d'attesa con scadenza di 30 minuti. | Fattibilità del flusso waiting list e dipendenze Gem Space. | Prima di implementare la waiting list. |
+| Q-012 | Verificare requisiti, limiti, documentazione di autenticazione e processo di pubblicazione delle Mini App Gem Space. | Dipendenza esterna, sicurezza e rilascio. | Prima dell'integrazione e pubblicazione. |
+| Q-013 | Validare la matrice dei permessi proposta per Super Admin, Gym Admin, Instructor e Member. | RBAC, API e sicurezza. | Prima di implementare Spring Security. |
+| Q-014 | Definire il provisioning della palestra e la creazione/assegnazione del primo Gym Admin. | Onboarding tenant e amministrazione globale. | Prima del flusso di onboarding. |
+| Q-015 | Definire l'effetto di cancellazione tardiva e No-show sugli abbonamenti temporali, che non hanno un contatore di crediti. | Regole di business e consistenza degli abbonamenti. | Prima della subscription logic. |
+| Q-016 | Definire se un iscritto può avere più abbonamenti attivi nella stessa palestra e quale viene utilizzato per una prenotazione. | Selezione piano, consumo crediti e modello dati. | Prima del database design. |
+| Q-017 | Definire se un abbonamento limita attività, corsi, fasce orarie o sedi. | Modello piano e verifica di eleggibilità alla prenotazione. | Prima del database design. |
+| Q-018 | Definire i dati anagrafici minimi del Member e chi può modificarli. | Privacy, UX e modello dati. | Prima del database design. |
+| Q-019 | Definire gli stati e le regole di attivazione/disattivazione di GymMembership. | Autorizzazioni e ciclo di vita dell'utente. | Prima del database design. |
+| Q-020 | Definire i casi in cui il personale può correggere una presenza già registrata e le relative regole di audit. | Tracciabilità e gestione operativa. | Prima del modulo presenze. |
+| Q-021 | Definire se l'interfaccia amministrativa per Gym Admin e Instructor sarà una console web separata, la stessa Mini App o un diverso canale. | Architettura frontend, UX, autenticazione e scope. | Prima della progettazione UX/architetturale. |
+
+## 11. Cronologia delle revisioni
 
 | Versione | Data | Modifiche |
 |---|---|---|
-| 0.1 | 17/11/2026 | Prima bozza redatta sulla base della discovery iniziale. |
+| 0.1 | 17/11/2026 | Prima bozza della discovery. |
+| 0.2 | 25/11/2026 | Consolidate le decisioni su cancellazioni, lista d'attesa, abbonamenti, consumo crediti, presenze, multi-gym, onboarding amministrativo e autenticazione Gem Space; aggiunte proposte RBAC e questioni aperte tracciate. |

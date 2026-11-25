@@ -2,28 +2,41 @@
 
 | Termine | Definizione nel contesto Fitora |
 |---|---|
-| Fitora | Piattaforma gestionale multi-tenant per palestre e centri fitness. |
-| Tenant | Organizzazione/struttura i cui dati sono logicamente isolati dagli altri clienti della piattaforma; nel progetto corrisponde a una palestra o, se deciso in futuro, a un'organizzazione con più sedi. |
-| Gym | Palestra registrata in Fitora. |
-| Super Admin | Ruolo con responsabilità di amministrazione globale della piattaforma. |
-| Gym Admin | Ruolo che amministra una specifica palestra. |
-| Instructor | Istruttore associato a una palestra e coinvolto nella gestione/conduzione delle lezioni. |
-| Member | Iscritto alla palestra che utilizza le funzioni riservate agli utenti finali. |
-| Course | Tipologia di attività o corso offerto dalla palestra (es. yoga, spinning). Da distinguere dalla singola lezione in calendario. |
-| Lesson / Session | Singola occorrenza programmata di un corso, con data, orario, istruttore e capienza. La terminologia definitiva sarà uniformata nel modello dati e nell'interfaccia. |
-| Calendar | Vista delle lezioni programmate e disponibili. |
+| Fitora | Codename temporaneo di una piattaforma gestionale multi-tenant per palestre e centri fitness. Il nome commerciale definitivo è TBD. |
+| Tenant | Organizzazione i cui dati sono logicamente isolati da quelli degli altri clienti; nell'MVP corrisponde a una palestra. |
+| Gym | Palestra registrata in Fitora e corrispondente tenant dell'MVP. |
+| Super Admin | Ruolo globale con responsabilità di amministrazione della piattaforma. |
+| Gym Admin | Ruolo che amministra una specifica palestra nel rispetto dei confini tenant. |
+| Instructor | Istruttore associato a una palestra e autorizzato a svolgere le operazioni assegnate, inclusa la registrazione delle presenze. |
+| Member | Iscritto che utilizza le funzioni riservate agli utenti finali. Una stessa identità può essere associata a più palestre. |
+| GymMembership | Associazione tra un'identità Fitora e una palestra. Contiene il contesto di appartenenza e il ruolo dell'utente in quella palestra. |
+| Course | Tipologia di attività offerta dalla palestra (ad esempio yoga o spinning), distinta dalla singola occorrenza in calendario. |
+| Lesson / Session | Singola occorrenza programmata di un corso, con data, orario, istruttore e capienza. La gestione delle ricorrenze è ancora da decidere. |
+| Calendar | Vista delle lezioni programmate e disponibili per una palestra. |
 | Booking | Prenotazione effettuata da un iscritto per una specifica lezione. |
-| Cancellation deadline | Termine entro il quale è consentito annullare una prenotazione senza applicare la regola di consumo tardivo. La finestra ipotizzata è di 24 ore prima dell'inizio. |
-| Waiting list | Elenco degli iscritti in attesa di un posto che si libera in una lezione piena. |
-| Attendance | Registrazione dell'esito della partecipazione: presente o assente. Non coincide necessariamente con il consumo di un ingresso/lezione. |
-| Membership plan | Tipologia di abbonamento configurata dalla palestra. |
-| Member subscription | Abbonamento concreto assegnato a un iscritto, basato su una tipologia/piano. |
-| Consumption | Diminuzione del numero di ingressi o lezioni disponibili, quando il piano e le regole prevedono un contatore. |
+| Cancellation deadline | Soglia temporale di 24 ore prima dell'inizio della lezione che distingue cancellazione tempestiva e tardiva. |
+| Late cancellation | Cancellazione effettuata con meno di 24 ore di anticipo. È consentita; per un piano a crediti comporta il consumo del credito. |
+| No-show | Mancata presentazione dell'iscritto a una lezione prenotata, registrata secondo la procedura operativa. Per un piano a crediti comporta il consumo del credito. |
+| Waiting list | Elenco FIFO di iscritti in attesa di un posto che si libera in una lezione piena. |
+| Waiting-list offer | Offerta temporanea del posto al primo iscritto eleggibile in lista d'attesa. Nell'MVP deve essere confermata entro 30 minuti. |
+| Attendance | Registrazione dell'esito della partecipazione: presente o assente. Non coincide necessariamente con il consumo di un credito. |
+| Membership plan | Tipologia di abbonamento configurata da una palestra. |
+| Member subscription | Abbonamento concreto assegnato a un iscritto sulla base di un piano. |
+| Time-based plan | Abbonamento temporale che consente accesso alle lezioni senza limite numerico durante il periodo di validità. |
+| Credit-based plan | Abbonamento che mette a disposizione un numero definito di lezioni/crediti da utilizzare entro una scadenza. |
+| Available credit | Credito disponibile e non ancora associato a una prenotazione. |
+| Reserved credit | Credito temporaneamente riservato a una prenotazione confermata. |
+| Consumed credit | Credito utilizzato a seguito della partecipazione, della cancellazione tardiva o del No-show secondo le regole concordate. |
+| Consumption | Diminuzione del numero di crediti disponibili, secondo il ciclo di riserva, restituzione e consumo. |
 | Multi-tenant | Architettura in cui più palestre utilizzano la stessa piattaforma mantenendo isolati i rispettivi dati e permessi. |
+| RBAC | Role-Based Access Control: modello di autorizzazione basato su ruoli. In Fitora i ruoli devono essere applicati nel contesto della palestra, salvo il ruolo globale Super Admin. |
+| Identity Provider (IdP) | Sistema che autentica l'identità dell'utente. Per l'MVP Fitora utilizza Gem Space come unico IdP. |
 | Gem Space Mini App | Applicazione eseguita all'interno dell'ecosistema Gem Space e integrata tramite il relativo Bridge SDK. |
 | Bridge SDK | Libreria `@gemspace/gem-bridge-sdk` utilizzata dal frontend per comunicare con l'ambiente Gem Space. |
-| JWT | JSON Web Token; nel contesto dell'integrazione, il README dello SDK descrive un token firmato e a breve durata rilasciato da Gem Space e da verificare sul backend. |
+| JWT | JSON Web Token; nel contesto dell'integrazione, lo SDK descrive un token firmato e a breve durata rilasciato da Gem Space e da verificare sul backend. |
+| Audit trail | Traccia delle operazioni rilevanti, con informazioni come operatore e data/ora dell'azione. |
 | MVP | Minimum Viable Product: prima versione con il set minimo di funzionalità necessario per dimostrare il valore principale del prodotto. |
 | PRD | Product Requirements Document: documento che descrive requisiti, regole e criteri del prodotto. |
 | User Flow | Sequenza di passaggi che un utente compie per completare un'operazione. |
 | Wireframe | Rappresentazione schematica di una schermata, concentrata su struttura e contenuti piuttosto che sullo stile grafico. |
+| TBD | To Be Defined: elemento ancora da definire o approvare. |
