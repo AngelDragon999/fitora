@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.3 — Draft aggiornato |
+| Versione | 0.4 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
 | Stato | Perimetro aggiornato; validazione cliente ancora necessaria |
 
@@ -17,7 +17,7 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 | Modulo | Funzionalità | Priorità | Stato / Note |
 |---|---|---|---|
 | Palestra | Provisioning e configurazione di una palestra | Must | Il Super Admin gestisce provisioning, ciclo di vita del tenant e assegnazione del primo Gym Admin; accesso ordinario ai dati operativi escluso. |
-| Utenti | Ruoli base e associazioni `GymMembership` | Must | Un'identità può appartenere a più palestre. Baseline RBAC approvata (D-021); dettagli Instructor lesson-edit e azioni amministrative su prenotazioni/lista d'attesa restano TBD. |
+| Utenti | Ruoli base e associazioni `GymMembership` | Must | Un'identità può appartenere a più palestre. Baseline RBAC approvata (D-021); nell'MVP la creazione/modifica di corsi e lezioni è riservata al Gym Admin (D-022). Le azioni amministrative puntuali su prenotazioni/lista d'attesa restano TBD (Q-023). |
 | Iscritti | Creazione manuale del profilo da parte del Gym Admin | Must | Decisione confermata; link Gem Space da progettare. |
 | Autenticazione | Gem Space come unico Identity Provider | Must | Decisione confermata; verifica JWT e linking da completare. |
 | Corsi/lezioni | Gestione corsi e programmazione delle lezioni | Must | Campi minimi definiti; ricorrenze da decidere. |
@@ -81,7 +81,7 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 
 ## 5. Dipendenze e condizioni di uscita
 1. Validare con il cliente le regole e il perimetro proposto.
-2. Implementare e testare la baseline RBAC approvata (D-021), completando prima le decisioni aperte Q-022 e Q-023.
+2. Implementare e testare la baseline RBAC approvata (D-021) e la regola di programmazione lezioni definita da D-022; risolvere Q-023 prima delle relative funzioni amministrative.
 3. Definire il processo operativo di provisioning della palestra e di creazione/assegnazione del primo Gym Admin.
 4. Definire la procedura sicura di collegamento identità Gem Space / Fitora.
 5. Verificare documentazione ufficiale, JWT e processo di pubblicazione Gem Space.
@@ -96,7 +96,7 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 
 - Super Admin: gestione globale del ciclo di vita dei tenant, provisioning e assegnazione del primo Gym Admin; nessun accesso ordinario ai dati operativi delle palestre.
 - Gym Admin: amministrazione della propria palestra.
-- Instructor: consultazione delle lezioni assegnate e registrazione delle presenze autorizzate; creazione/modifica delle lezioni ancora da decidere (Q-022).
+- Instructor: consultazione delle lezioni assegnate e registrazione delle presenze autorizzate; non può creare o modificare corsi o lezioni nell'MVP (D-022).
 - Member: consultazione delle informazioni pubblicate, gestione delle proprie prenotazioni e della propria posizione in lista d'attesa, consultazione del proprio abbonamento.
 - Tutti i permessi tenant-scoped devono essere verificati dal backend.
 
@@ -113,3 +113,10 @@ Possibili evoluzioni, da ordinare sulla base dei feedback delle palestre:
 - Sospensioni e proroghe degli abbonamenti.
 - Reportistica e statistiche per la palestra.
 - Gestione avanzata di più sedi e ulteriori funzioni per istruttori.
+
+## 7. Cronologia delle revisioni
+
+| Versione | Data | Modifiche |
+|---|---|---|
+| 0.3 | 25/11/2026 | Perimetro MVP aggiornato sulla base della discovery e baseline RBAC D-021. |
+| 0.4 | 25/11/2026 | Confermata D-022: solo Gym Admin crea/modifica corsi e lezioni nell'MVP; Instructor consulta lezioni assegnate e registra presenze autorizzate. |
