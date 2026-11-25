@@ -1,5 +1,10 @@
 # Fitora — Glossario
 
+| Campo | Valore |
+|---|---|
+| Versione | 0.5 — Draft aggiornato |
+| Data aggiornamento | 25 novembre 2026 |
+
 | Termine | Definizione nel contesto Fitora |
 |---|---|
 | Fitora | Codename temporaneo di una piattaforma gestionale multi-tenant per palestre e centri fitness. Il nome commerciale definitivo è TBD. |
@@ -34,9 +39,17 @@
 | Gem Space Mini App | Applicazione eseguita all'interno dell'ecosistema Gem Space e integrata tramite il relativo Bridge SDK. |
 | Bridge SDK | Libreria `@gemspace/gem-bridge-sdk` utilizzata dal frontend per comunicare con l'ambiente Gem Space. |
 | JWT | JSON Web Token; nel contesto dell'integrazione, lo SDK descrive un token firmato e a breve durata rilasciato da Gem Space e da verificare sul backend. |
-| Audit trail | Traccia delle operazioni rilevanti, con informazioni come operatore e data/ora dell'azione. |
+| Audit trail | Traccia delle operazioni rilevanti, con informazioni come operatore, data/ora, azione e, quando richiesta, motivazione. |
+| Administrative booking action | Operazione del Gym Admin eseguita per conto di un iscritto su prenotazioni o lista d'attesa, soggetta alle regole di business e alla tracciabilità. |
+| FIFO | First In, First Out: criterio che assegna priorità in base all'ordine temporale di ingresso nella lista d'attesa. |
 | MVP | Minimum Viable Product: prima versione con il set minimo di funzionalità necessario per dimostrare il valore principale del prodotto. |
 | PRD | Product Requirements Document: documento che descrive requisiti, regole e criteri del prodotto. |
 | User Flow | Sequenza di passaggi che un utente compie per completare un'operazione. |
 | Wireframe | Rappresentazione schematica di una schermata, concentrata su struttura e contenuti piuttosto che sullo stile grafico. |
 | TBD | To Be Defined: elemento ancora da definire o approvare. |
+
+## Cronologia delle revisioni
+
+| Versione | Data | Modifiche |
+|---|---|---|
+| 0.5 | 25/11/2026 | Aggiunti i termini relativi alle operazioni amministrative su prenotazioni/lista d'attesa e aggiornato l'audit trail. |

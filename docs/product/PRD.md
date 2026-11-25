@@ -2,9 +2,9 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.4 — Draft aggiornato |
+| Versione | 0.5 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
-| Stato | Requisiti aggiornati sulla base della discovery; restano questioni aperte da validare |
+| Stato | Requisiti consolidati sulla base della discovery; restano questioni aperte e validazione cliente |
 | Product owner | Da assegnare |
 | Canale iniziale | Gem Space Mini App |
 | Nome prodotto | Fitora è un codename temporaneo |
@@ -112,14 +112,17 @@ La seguente matrice è stata approvata come baseline funzionale per l'MVP. I per
 | Creare/modificare lezioni | No | Sì, propria palestra | No nell'MVP | No |
 | Gestire iscritti e istruttori | No, salvo gestione dell'account del Gym Admin nell'ambito del provisioning | Sì, propria palestra | No | No; può consultare/aggiornare solo i campi del proprio profilo che saranno autorizzati |
 | Creare/modificare piani e assegnare abbonamenti | No | Sì, propria palestra | No | No |
-| Consultare e gestire prenotazioni | No | Consultazione e gestione amministrativa nella propria palestra; azioni puntuali da specificare | Consultazione delle lezioni assegnate e delle relative informazioni operative | Sì, proprie prenotazioni |
-| Entrare/uscire dalla lista d'attesa e confermare/rifiutare un'offerta | No | Consultazione/gestione amministrativa nella propria palestra; azioni puntuali da specificare | No | Sì, per sé |
+| Consultare e gestire prenotazioni | No | Consulta tutte le prenotazioni della propria palestra; può creare o cancellare prenotazioni per conto di un iscritto, rispettando capienza, idoneità e regole di cancellazione | Consulta le prenotazioni delle lezioni assegnate e le informazioni operative necessarie | Sì, proprie prenotazioni |
+| Entrare/uscire dalla lista d'attesa e confermare/rifiutare un'offerta | No | Consulta la lista d'attesa; può aggiungere o rimuovere un iscritto per suo conto, senza modificare l'ordine FIFO né saltare la coda | No | Sì, per sé |
 | Registrare presenza/assenza | No | Sì, propria palestra | Sì, per le lezioni autorizzate | No |
 | Consultare il proprio abbonamento | No | Sì, per gli iscritti della propria palestra | No | Sì, il proprio |
+| Modificare manualmente i crediti per aggirare le regole di consumo | No | No | No | No |
 
 **Confini del Super Admin.** Il Super Admin ha privilegi globali limitati all'amministrazione della piattaforma: gestione del ciclo di vita dei tenant, provisioning e assegnazione del primo Gym Admin. Non dispone di accesso ordinario ai dati personali e operativi delle singole palestre (iscritti, prenotazioni, presenze e abbonamenti). Eventuali accessi eccezionali per assistenza non fanno parte dei permessi ordinari dell'MVP e richiederebbero una policy separata, autorizzazione e tracciamento.
 
 **Confini del Gym Admin.** Il Gym Admin amministra la propria palestra e non può accedere ai dati o alle operazioni di altri tenant.
+
+Il Gym Admin può consultare tutte le prenotazioni e la lista d'attesa della propria palestra; può inoltre creare o cancellare prenotazioni e aggiungere o rimuovere iscritti dalla lista d'attesa per conto dell'iscritto. Queste operazioni devono rispettare le stesse regole di capienza, idoneità dell'abbonamento, cancellazione e FIFO applicate alle operazioni dell'iscritto. L'inserimento manuale in lista d'attesa avviene in coda, in base al momento dell'operazione. Il Gym Admin non può riordinare manualmente la lista, promuovere un iscritto saltando la coda né modificare manualmente i crediti per aggirare le regole di consumo. Ogni intervento amministrativo su prenotazioni o lista d'attesa deve registrare operatore, data/ora, azione e motivazione.
 
 **Confini dell'Instructor.** L'Instructor consulta le lezioni a cui è assegnato e le informazioni necessarie alla conduzione della lezione; può registrare presenza/assenza per le lezioni per cui è autorizzato. Nell'MVP non può creare o modificare corsi né lezioni; queste operazioni sono riservate al Gym Admin (D-022).
 
@@ -152,6 +155,9 @@ Distinzione terminologica: un `Course` rappresenta la tipologia di attività (ad
 | FR-BKG-007 | L'iscritto deve poter confermare o rifiutare l'offerta entro 30 minuti; in assenza di conferma entro il termine, l'offerta scade e il posto viene proposto al successivo. | Must | Confermato per l'MVP; canale di notifica/avviso da definire. |
 | FR-BKG-008 | Il sistema dovrebbe impedire allo stesso iscritto di effettuare prenotazioni duplicate per la stessa lezione. | Must | Regola proposta da validare; raccomandata per integrità operativa. |
 | FR-BKG-009 | Il sistema potrebbe consentire la sincronizzazione con il calendario personale del dispositivo. | Out of scope | Non inclusa nell'MVP; fattibilità Mini App da verificare per una versione successiva. |
+| FR-BKG-010 | Il Gym Admin deve poter consultare tutte le prenotazioni e la lista d'attesa della propria palestra. | Must | Accesso limitato al tenant di appartenenza. |
+| FR-BKG-011 | Il Gym Admin deve poter creare o cancellare prenotazioni per conto di un iscritto della propria palestra. | Must | Le operazioni devono rispettare capienza, idoneità dell'abbonamento e regole temporali di cancellazione; è obbligatoria una motivazione. |
+| FR-BKG-012 | Il Gym Admin deve poter aggiungere o rimuovere un iscritto dalla lista d'attesa per suo conto. | Must | L'inserimento avviene in coda; non è consentito modificare l'ordine FIFO né saltare la coda. |
 
 Regole operative della lista d'attesa:
 - L'ordine è FIFO, basato sul momento di ingresso nella lista.
@@ -236,6 +242,12 @@ Per l'MVP non è previsto un login autonomo Fitora con username/password né un 
 
 La conferma entro 30 minuti è una regola funzionale approvata, ma non è ancora definito come l'iscritto venga avvisato in tempo utile. Questo è un punto bloccante per la progettazione completa del flusso di lista d'attesa.
 
+### 5.9 Tracciabilità delle operazioni amministrative
+
+| ID | Requisito | Priorità | Stato / Note |
+|---|---|---|---|
+| FR-AUD-001 | Il sistema deve registrare le operazioni amministrative del Gym Admin su prenotazioni e lista d'attesa. | Must | Registrare almeno operatore, data/ora, azione e motivazione. Accesso e conservazione dei log saranno dettagliati nel design. |
+
 ## 6. Regole di business
 
 | ID | Regola | Stato |
@@ -257,6 +269,9 @@ La conferma entro 30 minuti è una regola funzionale approvata, ma non è ancora
 | BR-015 | La stessa identità può essere associata a più palestre tramite `GymMembership` distinte. | Confermata. |
 | BR-016 | Il Gym Admin crea manualmente il profilo dell'iscritto per la propria palestra; il linking con Gem Space avviene con una procedura da definire. | Prima parte confermata; procedura di linking aperta. |
 | BR-017 | Gem Space è l'unico Identity Provider dell'MVP; ruoli e autorizzazioni applicative sono gestiti da Fitora. | Confermata. |
+| BR-018 | Il Gym Admin può creare o cancellare prenotazioni per conto di un iscritto della propria palestra, applicando le stesse regole di capienza, idoneità e cancellazione previste per l'iscritto. | Confermata (D-023). |
+| BR-019 | Il Gym Admin può aggiungere o rimuovere un iscritto dalla lista d'attesa per suo conto; l'inserimento avviene in coda e l'ordine FIFO non può essere alterato manualmente né aggirato con promozioni fuori sequenza. | Confermata (D-023). |
+| BR-020 | Le operazioni amministrative su prenotazioni e lista d'attesa devono essere tracciate con operatore, data/ora, azione e motivazione; non è consentito modificare manualmente i crediti per aggirare le regole di consumo. | Confermata (D-023). |
 
 **Precisazione sul posto liberato:** una cancellazione, anche tardiva, libera il posto per una possibile assegnazione alla lista d'attesa. Il consumo del credito dell'iscritto che cancella e la disponibilità fisica del posto sono due aspetti distinti.
 
@@ -296,6 +311,9 @@ L'MVP potrà essere considerato dimostrabile quando:
 12. È possibile configurare e assegnare un piano temporale e un piano a crediti.
 13. I test dimostrano che un tenant non può accedere ai dati di un altro tenant.
 14. I test verificano che un utente non possa utilizzare più volte lo stesso credito o occupare più posti per la stessa lezione in violazione delle regole approvate.
+15. Il Gym Admin può consultare e gestire prenotazioni/lista d'attesa esclusivamente nella propria palestra e per conto degli iscritti secondo D-023.
+16. Le operazioni amministrative rispettano capienza, idoneità, regole di cancellazione e ordine FIFO; non è possibile saltare la coda o alterare manualmente i crediti per aggirare le regole.
+17. Ogni intervento amministrativo su prenotazioni/lista d'attesa registra operatore, data/ora, azione e motivazione.
 
 I criteri 3 e 8-9 dipendono dalla risoluzione rispettivamente del linking Gem Space e del canale di avviso dell'offerta della lista d'attesa.
 
@@ -315,6 +333,8 @@ I criteri 3 e 8-9 dipendono dalla risoluzione rispettivamente del linking Gem Sp
 
 Le seguenti questioni non sono state ancora approvate come requisiti definitivi e devono rimanere tracciate nel registro decisionale.
 
+La precedente Q-023 è stata chiusa con D-023: le azioni amministrative del Gym Admin su prenotazioni e lista d'attesa sono definite per l'MVP.
+
 | ID | Questione | Impatto | Quando risolvere |
 |---|---|---|---|
 | Q-002 | Confermare con il cliente che pagamenti online, fatture e ricevute restino fuori dall'MVP. | Scope, integrazioni, implicazioni amministrative. | Validazione scope. |
@@ -331,7 +351,6 @@ Le seguenti questioni non sono state ancora approvate come requisiti definitivi 
 | Q-019 | Definire gli stati e le regole di attivazione/disattivazione di GymMembership. | Autorizzazioni e ciclo di vita dell'utente. | Prima del database design. |
 | Q-020 | Definire i casi in cui il personale può correggere una presenza già registrata e le relative regole di audit. | Tracciabilità e gestione operativa. | Prima del modulo presenze. |
 | Q-021 | Definire se l'interfaccia amministrativa per Gym Admin e Instructor sarà una console web separata, la stessa Mini App o un diverso canale. | Architettura frontend, UX, autenticazione e scope. | Prima della progettazione UX/architetturale. |
-| Q-023 | Specificare le azioni amministrative del Gym Admin sulle prenotazioni e sulla lista d'attesa (ad esempio cancellazioni per conto dell'iscritto o interventi manuali). | Regole operative, audit e API. | Prima di implementare le funzioni amministrative. |
 
 ## 11. Cronologia delle revisioni
 
@@ -340,4 +359,5 @@ Le seguenti questioni non sono state ancora approvate come requisiti definitivi 
 | 0.1 | 17/11/2026 | Prima bozza della discovery. |
 | 0.2 | 25/11/2026 | Consolidate le decisioni su cancellazioni, lista d'attesa, abbonamenti, consumo crediti, presenze, multi-gym, onboarding amministrativo e autenticazione Gem Space; aggiunte proposte RBAC e questioni aperte tracciate. |
 | 0.3 | 25/11/2026 | Approvata la baseline RBAC D-021; chiariti i confini del Super Admin e mantenute aperte le decisioni di dettaglio Q-022 e Q-023. |
-| 0.4 | 25/11/2026 | Confermato con D-022 che nell'MVP solo il Gym Admin può creare/modificare corsi e lezioni; l'Instructor consulta le lezioni assegnate e registra le presenze autorizzate. Q-022 chiusa; Q-023 resta aperta. |
+| 0.4 | 25/11/2026 | Confermato con D-022 che nell'MVP solo il Gym Admin può creare/modificare corsi e lezioni; l'Instructor consulta le lezioni assegnate e registra le presenze autorizzate. |
+| 0.5 | 25/11/2026 | Definite con D-023 le azioni amministrative del Gym Admin su prenotazioni e lista d'attesa, i vincoli FIFO e di business e la relativa tracciabilità; chiusa Q-023. |

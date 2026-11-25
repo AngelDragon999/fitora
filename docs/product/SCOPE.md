@@ -2,9 +2,9 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.4 — Draft aggiornato |
+| Versione | 0.5 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
-| Stato | Perimetro aggiornato; validazione cliente ancora necessaria |
+| Stato | Perimetro MVP consolidato sulla discovery; validazione cliente ancora necessaria |
 
 ## 1. Obiettivo dell'MVP
 
@@ -17,12 +17,13 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 | Modulo | Funzionalità | Priorità | Stato / Note |
 |---|---|---|---|
 | Palestra | Provisioning e configurazione di una palestra | Must | Il Super Admin gestisce provisioning, ciclo di vita del tenant e assegnazione del primo Gym Admin; accesso ordinario ai dati operativi escluso. |
-| Utenti | Ruoli base e associazioni `GymMembership` | Must | Un'identità può appartenere a più palestre. Baseline RBAC approvata (D-021); nell'MVP la creazione/modifica di corsi e lezioni è riservata al Gym Admin (D-022). Le azioni amministrative puntuali su prenotazioni/lista d'attesa restano TBD (Q-023). |
+| Utenti | Ruoli base e associazioni `GymMembership` | Must | Un'identità può appartenere a più palestre. Baseline RBAC approvata (D-021); nell'MVP solo il Gym Admin crea/modifica corsi e lezioni (D-022). Le azioni amministrative su prenotazioni/lista d'attesa sono definite da D-023. |
 | Iscritti | Creazione manuale del profilo da parte del Gym Admin | Must | Decisione confermata; link Gem Space da progettare. |
 | Autenticazione | Gem Space come unico Identity Provider | Must | Decisione confermata; verifica JWT e linking da completare. |
 | Corsi/lezioni | Gestione corsi e programmazione delle lezioni | Must | Campi minimi definiti; ricorrenze da decidere. |
 | Calendario | Consultazione delle lezioni per data | Must | Filtri e dettagli UX da progettare. |
 | Prenotazioni | Prenotazione esplicita e prevenzione del superamento capienza | Must | Gestire consistenza sotto concorrenza. |
+| Operazioni amministrative | Consultazione e gestione delle prenotazioni per conto degli iscritti | Must | Gym Admin può creare/cancellare prenotazioni e gestire ingressi/uscite dalla lista per conto degli iscritti, nel rispetto della business logic e con audit trail (D-023). |
 | Cancellazione | Disdetta almeno 24 ore prima senza consumo; disdetta tardiva consentita con consumo del credito sui piani a crediti | Must | Regola approvata. |
 | Lista d'attesa | FIFO e offerta al primo iscritto; 30 minuti per confermare | Must | Regola approvata; canale di avviso da definire. |
 | Abbonamenti | Piani temporali e a crediti configurabili dalla palestra | Must | Modelli approvati; stati/campi dettagliati da definire. |
@@ -41,6 +42,8 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 - Dashboard, statistiche e reportistica evoluta.
 - App native separate per iOS e Android.
 - Configurabilità per singola palestra della finestra di conferma della lista d'attesa: nell'MVP il termine è fisso a 30 minuti.
+- Riordino manuale della lista FIFO o promozione amministrativa che salti la coda.
+- Modifica manuale dei crediti per aggirare le regole di consumo.
 
 **Nota:** l'offerta della lista d'attesa deve comunque essere resa visibile all'iscritto in tempo utile. Il canale minimo per farlo è una dipendenza da risolvere; non può essere considerato automaticamente coperto dall'esclusione delle notifiche push.
 
@@ -79,9 +82,18 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 - Presenza/assenza non coincide automaticamente con consumo del credito.
 - È raccomandata la tracciabilità dell'operatore e del timestamp.
 
+### 4.5 Operazioni amministrative su prenotazioni e lista d'attesa
+
+- Il Gym Admin può consultare tutte le prenotazioni e la lista d'attesa della propria palestra.
+- Può creare o cancellare prenotazioni e aggiungere o rimuovere iscritti dalla lista d'attesa per loro conto.
+- Deve rispettare capienza, idoneità dell'abbonamento, regole di cancellazione e ordine FIFO.
+- Un nuovo inserimento amministrativo in lista viene accodato; non sono consentiti riordino manuale o promozione fuori sequenza.
+- Non è consentito modificare manualmente i crediti per aggirare le regole di consumo.
+- Ogni intervento deve registrare operatore, data/ora, azione e motivazione.
+
 ## 5. Dipendenze e condizioni di uscita
 1. Validare con il cliente le regole e il perimetro proposto.
-2. Implementare e testare la baseline RBAC approvata (D-021) e la regola di programmazione lezioni definita da D-022; risolvere Q-023 prima delle relative funzioni amministrative.
+2. Implementare e testare la baseline RBAC (D-021), la regola di programmazione lezioni (D-022) e le operazioni amministrative su prenotazioni/lista d'attesa (D-023), inclusa la tracciabilità.
 3. Definire il processo operativo di provisioning della palestra e di creazione/assegnazione del primo Gym Admin.
 4. Definire la procedura sicura di collegamento identità Gem Space / Fitora.
 5. Verificare documentazione ufficiale, JWT e processo di pubblicazione Gem Space.
@@ -91,6 +103,7 @@ Il multi-tenant deve essere previsto fin dalla prima versione, anche se la prima
 9. Definire stati e dati minimi degli abbonamenti, comportamento dei piani temporali in caso di cancellazione tardiva/No-show e gestione di più abbonamenti attivi.
 10. Definire dati anagrafici minimi e ciclo di vita di `GymMembership`.
 11. Eseguire test di isolamento multi-tenant, concorrenza sulla capienza e concorrenza sui crediti.
+12. Testare che le operazioni del Gym Admin rispettino capienza, idoneità, cancellazione e FIFO e che ogni intervento sia tracciato.
 
 ### 5.1 Baseline RBAC approvata
 
@@ -120,3 +133,4 @@ Possibili evoluzioni, da ordinare sulla base dei feedback delle palestre:
 |---|---|---|
 | 0.3 | 25/11/2026 | Perimetro MVP aggiornato sulla base della discovery e baseline RBAC D-021. |
 | 0.4 | 25/11/2026 | Confermata D-022: solo Gym Admin crea/modifica corsi e lezioni nell'MVP; Instructor consulta lezioni assegnate e registra presenze autorizzate. |
+| 0.5 | 25/11/2026 | Definite con D-023 le operazioni amministrative su prenotazioni e lista d'attesa, i vincoli FIFO e la tracciabilità; chiusa Q-023. |

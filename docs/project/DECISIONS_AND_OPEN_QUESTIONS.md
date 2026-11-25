@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.4 — Draft aggiornato |
+| Versione | 0.5 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
 | Scopo | Tracciare decisioni approvate, decisioni provvisorie e questioni ancora aperte |
 
@@ -32,8 +32,9 @@ Questo registro è la fonte di tracciabilità delle decisioni di prodotto. Una p
 | D-018 | Una stessa identità utente può appartenere contemporaneamente a più palestre tramite `GymMembership` distinte. | Confermata. Ruolo e dati operativi sono contestuali alla singola palestra. |
 | D-019 | Per l'MVP il Gym Admin crea manualmente il profilo Member nella propria palestra. | Confermata. L'invito tramite link è rinviato a una versione futura. |
 | D-020 | Gem Space è l'unico Identity Provider (IdP) per l'autenticazione nell'MVP. | Confermata. Fitora gestisce internamente ruoli, autorizzazioni e associazioni alle palestre. |
-| D-021 | È approvata la baseline RBAC per l'MVP. | Super Admin: amministrazione globale dei tenant, provisioning e assegnazione del primo Gym Admin, senza accesso ordinario ai dati operativi delle palestre. Gym Admin: amministrazione della propria palestra. Instructor: accesso alle lezioni assegnate e registrazione delle presenze autorizzate. Member: gestione dei propri dati, prenotazioni, lista d'attesa e consultazione del proprio abbonamento. I dettagli sui permessi di programmazione delle lezioni sono definiti da D-022; Q-023 resta aperta. |
+| D-021 | È approvata la baseline RBAC per l'MVP. | Super Admin: amministrazione globale dei tenant, provisioning e assegnazione del primo Gym Admin, senza accesso ordinario ai dati operativi delle palestre. Gym Admin: amministrazione della propria palestra. Instructor: accesso alle lezioni assegnate e registrazione delle presenze autorizzate. Member: gestione dei propri dati, prenotazioni, lista d'attesa e consultazione del proprio abbonamento. I permessi di programmazione sono definiti da D-022; le azioni amministrative su prenotazioni/lista d'attesa sono definite da D-023. |
 | D-022 | Nell'MVP la creazione e la modifica di corsi e lezioni sono riservate al Gym Admin. | L'Instructor può consultare le lezioni assegnate e registrare le presenze autorizzate, ma non può creare o modificare corsi o lezioni. Decisione confermata il 25/11/2026. |
+| D-023 | Il Gym Admin può gestire operativamente prenotazioni e lista d'attesa per conto degli iscritti della propria palestra entro i limiti della business logic. | Può consultare tutte le prenotazioni e la lista d'attesa; creare/cancellare prenotazioni e aggiungere/rimuovere iscritti dalla lista. Non può riordinare la coda FIFO, promuovere manualmente saltando la coda né modificare crediti per aggirare le regole di consumo. Ogni intervento richiede registrazione di operatore, data/ora, azione e motivazione. Confermata il 25/11/2026. |
 
 ## 2. Questioni aperte
 
@@ -55,7 +56,6 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 | Q-019 | Quali stati e regole di attivazione/disattivazione deve avere `GymMembership`? | Autorizzazioni e ciclo di vita. | Alta |
 | Q-020 | Chi può correggere una presenza già registrata e con quali motivazioni/tracciamento? | Audit e gestione operativa. | Media |
 | Q-021 | L'interfaccia amministrativa per Gym Admin e Instructor sarà una console web separata, la stessa Mini App o un altro canale? | Frontend, UX, architettura e scope. | Alta |
-| Q-023 | Quali azioni amministrative puntuali può eseguire il Gym Admin sulle prenotazioni e sulla lista d'attesa (ad esempio cancellazioni per conto dell'iscritto o interventi manuali)? | Regole operative, audit e API. | Media |
 
 ## 3. Questioni chiuse o parzialmente chiuse
 
@@ -71,6 +71,7 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 | Identity Provider | Gem Space unico IdP per l'MVP. | D-020 |
 | Matrice dei permessi RBAC | Baseline approvata: Super Admin limitato all'amministrazione globale dei tenant; Gym Admin opera sulla propria palestra; Instructor opera sulle lezioni assegnate e registra le presenze autorizzate; Member gestisce le proprie operazioni. | D-021 |
 | Permessi di programmazione lezioni | Nell'MVP solo il Gym Admin crea/modifica corsi e lezioni; l'Instructor non dispone di questi permessi. | D-022 |
+| Azioni amministrative su prenotazioni/lista d'attesa | Gym Admin può consultare, creare/cancellare prenotazioni e aggiungere/rimuovere iscritti dalla lista per loro conto; non può alterare FIFO o aggirare le regole di consumo. Operazioni tracciate con operatore, data/ora, azione e motivazione. | D-023 (Q-023 chiusa) |
 | Metodo di collegamento identità | Non deciso; la questione rimane aperta. | Q-008 |
 | Sincronizzazione calendario dispositivo | Non inclusa nell'MVP; fattibilità futura da verificare. | Scope / PRD |
 | QR code | Non incluso nell'MVP. | D-010 |
@@ -78,7 +79,6 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 ## 4. Assunzioni e proposte da non considerare decisioni
 
 - L'uso di un codice temporaneo monouso per collegare l'identità Gem Space al profilo Fitora è soltanto un'ipotesi da valutare; non è stata adottata.
-- Le azioni amministrative puntuali del Gym Admin su prenotazioni e lista d'attesa restano da specificare (Q-023).
 - Non è ancora definito il canale di comunicazione per le offerte della lista d'attesa.
 - Non è ancora definita la gestione di più abbonamenti attivi per lo stesso iscritto nella stessa palestra.
 - I dettagli JWT (issuer, audience, algoritmo, chiavi e claim) devono provenire dalla documentazione ufficiale Gem Space.
@@ -92,3 +92,10 @@ Quando una questione viene risolta:
 2. si aggiorna il PRD e, quando necessario, lo Scope;
 3. si sposta la questione da "Questioni aperte" a "Questioni chiuse o parzialmente chiuse";
 4. non si riutilizza l'ID di una decisione o questione già esistente.
+
+## 6. Cronologia delle revisioni
+
+| Versione | Data | Modifiche |
+|---|---|---|
+| 0.4 | 25/11/2026 | Baseline decisionale fino a D-022; Q-023 ancora aperta. |
+| 0.5 | 25/11/2026 | Aggiunta D-023; definite le azioni amministrative del Gym Admin su prenotazioni e lista d'attesa; chiusa Q-023. |

@@ -3,7 +3,7 @@
 | Campo | Valore |
 |---|---|
 | Prodotto | Fitora (codename temporaneo) |
-| Versione documento | 0.2 — Draft aggiornato |
+| Versione documento | 0.5 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
 | Stato | Visione aggiornata; da validare con una palestra cliente |
 | Tipologia | Piattaforma gestionale multi-tenant per palestre |
@@ -56,7 +56,7 @@ Questa descrizione è una prima ipotesi di problema, da verificare con una pales
 
 ## 6. Perimetro iniziale e visione futura
 
-L'MVP è orientato a un flusso operativo completo: una palestra è configurata, il personale crea le lezioni, un iscritto consulta il calendario e prenota, il sistema applica capienza e regole di cancellazione, la lista d'attesa gestisce i posti liberati, e la palestra registra l'esito della partecipazione.
+L'MVP è orientato a un flusso operativo completo: una palestra è configurata, il Gym Admin crea le lezioni e può gestire prenotazioni e lista d'attesa per conto degli iscritti entro le regole previste, un iscritto consulta il calendario e prenota, il sistema applica capienza e regole di cancellazione, la lista d'attesa gestisce i posti liberati, e il personale autorizzato registra l'esito della partecipazione.
 
 Le funzionalità successive potranno includere check-in tramite QR code, sincronizzazione con calendari personali, inviti tramite link, notifiche push o messaggistica, pagamenti online, rinnovi automatici, sospensioni, reportistica evoluta e gestione avanzata di più sedi. Queste possibilità non fanno parte automaticamente dell'MVP e dovranno essere valutate separatamente.
 
@@ -65,3 +65,9 @@ Le funzionalità successive potranno includere check-in tramite QR code, sincron
 La prima versione dovrà dimostrare un flusso completo e verificabile per almeno una palestra, mantenendo già nel modello e nei controlli backend la separazione multi-tenant: gestione di una lezione, consultazione da parte di un iscritto associato, prenotazione entro la capienza, applicazione della regola di cancellazione e del consumo dei crediti, gestione della lista d'attesa e registrazione delle presenze.
 
 Il rilascio su Gem Space richiederà inoltre la verifica dell'autenticazione, del collegamento tra identità Gem Space e identità Fitora e dei prerequisiti di pubblicazione.
+
+## 8. Cronologia delle revisioni
+
+| Versione | Data | Modifiche |
+|---|---|---|
+| 0.5 | 25/11/2026 | Allineata la visione alla baseline funzionale e alle operazioni amministrative Gym Admin definite per l'MVP. |
