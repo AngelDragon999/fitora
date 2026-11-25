@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.2 — Draft aggiornato |
+| Versione | 0.3 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
 | Scopo | Tracciare decisioni approvate, decisioni provvisorie e questioni ancora aperte |
 
@@ -15,7 +15,7 @@ Questo registro è la fonte di tracciabilità delle decisioni di prodotto. Una p
 | D-001 | Fitora è una piattaforma gestionale per palestre e centri fitness. | Confermata. |
 | D-002 | La piattaforma deve supportare più palestre indipendenti. | Confermata; modello multi-tenant. |
 | D-003 | Le palestre gestiscono i propri dati e gli iscritti utilizzano un'interfaccia dedicata. | Confermata. |
-| D-004 | Ruoli di base: Super Admin, Gym Admin, Instructor e Member. | Confermati; matrice dei permessi ancora da validare. |
+| D-004 | Ruoli di base: Super Admin, Gym Admin, Instructor e Member. | Confermati; baseline RBAC approvata con D-021, con dettagli specifici ancora aperti. |
 | D-005 | L'iscritto può consultare il calendario e prenotare una lezione tramite un'azione esplicita. | Confermata. |
 | D-006 | Ogni lezione ha una capienza massima e il sistema non deve permettere di superarla. | Confermata; consistenza sotto concorrenza da progettare e testare. |
 | D-007 | È prevista una lista d'attesa per i posti che si liberano. | Confermata. |
@@ -32,6 +32,7 @@ Questo registro è la fonte di tracciabilità delle decisioni di prodotto. Una p
 | D-018 | Una stessa identità utente può appartenere contemporaneamente a più palestre tramite `GymMembership` distinte. | Confermata. Ruolo e dati operativi sono contestuali alla singola palestra. |
 | D-019 | Per l'MVP il Gym Admin crea manualmente il profilo Member nella propria palestra. | Confermata. L'invito tramite link è rinviato a una versione futura. |
 | D-020 | Gem Space è l'unico Identity Provider (IdP) per l'autenticazione nell'MVP. | Confermata. Fitora gestisce internamente ruoli, autorizzazioni e associazioni alle palestre. |
+| D-021 | È approvata la baseline RBAC per l'MVP. | Super Admin: amministrazione globale dei tenant, provisioning e assegnazione del primo Gym Admin, senza accesso ordinario ai dati operativi delle palestre. Gym Admin: amministrazione della propria palestra. Instructor: accesso alle lezioni assegnate e registrazione delle presenze autorizzate. Member: gestione dei propri dati, prenotazioni, lista d'attesa e consultazione del proprio abbonamento. La creazione/modifica delle lezioni da parte dell'Instructor resta TBD (Q-022). |
 
 ## 2. Questioni aperte
 
@@ -45,7 +46,6 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 | Q-009 | L'MVP gestisce lezioni singole soltanto oppure anche serie ricorrenti? | Modello Course/Lesson e calendario. | Alta |
 | Q-011 | Come viene avvisato tempestivamente l'iscritto dell'offerta di lista d'attesa con scadenza di 30 minuti? | Fattibilità del flusso waiting list. | Bloccante per la waiting list end-to-end |
 | Q-012 | Quali sono i requisiti tecnici, i limiti, i claim JWT, le chiavi di verifica e i passaggi di pubblicazione ufficiali di Gem Space? | Autenticazione e rilascio. | Bloccante per integrazione Gem Space |
-| Q-013 | La matrice iniziale dei permessi proposta nel PRD è corretta? In particolare, quali operazioni possono eseguire Instructor e Super Admin? | RBAC, API e sicurezza. | Alta |
 | Q-014 | Chi crea/provisiona una palestra e come viene creato o assegnato il primo Gym Admin? | Onboarding del tenant. | Alta |
 | Q-015 | Qual è l'effetto di una cancellazione tardiva o di un No-show su un abbonamento temporale, che non ha crediti da consumare? | Regole di business. | Alta |
 | Q-016 | Un iscritto può avere più abbonamenti attivi nella stessa palestra? Se sì, quale viene usato per prenotare? | Consumo crediti e modello dati. | Alta |
@@ -54,6 +54,8 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 | Q-019 | Quali stati e regole di attivazione/disattivazione deve avere `GymMembership`? | Autorizzazioni e ciclo di vita. | Alta |
 | Q-020 | Chi può correggere una presenza già registrata e con quali motivazioni/tracciamento? | Audit e gestione operativa. | Media |
 | Q-021 | L'interfaccia amministrativa per Gym Admin e Instructor sarà una console web separata, la stessa Mini App o un altro canale? | Frontend, UX, architettura e scope. | Alta |
+| Q-022 | L'Instructor può creare o modificare lezioni, oppure può soltanto consultare le lezioni assegnate e registrare le presenze? | Permessi applicativi, API e interfaccia amministrativa. | Alta |
+| Q-023 | Quali azioni amministrative puntuali può eseguire il Gym Admin sulle prenotazioni e sulla lista d'attesa (ad esempio cancellazioni per conto dell'iscritto o interventi manuali)? | Regole operative, audit e API. | Media |
 
 ## 3. Questioni chiuse o parzialmente chiuse
 
@@ -67,15 +69,16 @@ Le domande qui elencate non sono decisioni. Non devono essere codificate come re
 | Utente su più palestre | Supportato tramite `GymMembership` distinte. | D-018 |
 | Creazione profilo Member | Creazione manuale da parte del Gym Admin; invito via link rinviato. | D-019 |
 | Identity Provider | Gem Space unico IdP per l'MVP. | D-020 |
+| Matrice dei permessi RBAC | Baseline approvata: Super Admin limitato all'amministrazione globale dei tenant; Gym Admin opera sulla propria palestra; Instructor opera sulle lezioni assegnate e registra le presenze autorizzate; Member gestisce le proprie operazioni. I dettagli Q-022 e Q-023 restano aperti. | D-021 |
 | Metodo di collegamento identità | Non deciso; la questione rimane aperta. | Q-008 |
 | Sincronizzazione calendario dispositivo | Non inclusa nell'MVP; fattibilità futura da verificare. | Scope / PRD |
 | QR code | Non incluso nell'MVP. | D-010 |
 
 ## 4. Assunzioni e proposte da non considerare decisioni
 
-- La matrice dei permessi presente nel PRD è una proposta di lavoro, non una decisione approvata.
 - L'uso di un codice temporaneo monouso per collegare l'identità Gem Space al profilo Fitora è soltanto un'ipotesi da valutare; non è stata adottata.
-- Non è ancora deciso se gli Instructor possano creare o modificare corsi e lezioni.
+- Non è ancora deciso se gli Instructor possano creare o modificare lezioni (Q-022); la creazione/modifica dei corsi resta riservata al Gym Admin nell'MVP.
+- Le azioni amministrative puntuali del Gym Admin su prenotazioni e lista d'attesa restano da specificare (Q-023).
 - Non è ancora definito il canale di comunicazione per le offerte della lista d'attesa.
 - Non è ancora definita la gestione di più abbonamenti attivi per lo stesso iscritto nella stessa palestra.
 - I dettagli JWT (issuer, audience, algoritmo, chiavi e claim) devono provenire dalla documentazione ufficiale Gem Space.

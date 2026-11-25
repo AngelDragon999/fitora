@@ -1,86 +1,18 @@
-# Fitora
+# Fitora — Documentazione v0.3
 
-**Fitora** è una piattaforma gestionale multi-tenant in progettazione, pensata per palestre e centri fitness. Il progetto nasce per centralizzare la gestione di iscritti, istruttori, lezioni, calendario, prenotazioni, presenze e abbonamenti.
+Pacchetto documentale aggiornato al 25 novembre 2026.
 
-> **Stato del progetto:** Product Discovery e definizione requisiti — versione documentale 0.1 (17 novembre 2026). Non è ancora presente un'implementazione applicativa.
+## Contenuto
+- `PRODUCT_VISION.md` — visione del prodotto.
+- `PRD.md` — requisiti funzionali e non funzionali.
+- `SCOPE.md` — perimetro MVP e condizioni di uscita.
+- `DECISIONS_AND_OPEN_QUESTIONS.md` — decisioni e questioni aperte.
+- `GLOSSARY.md` — terminologia comune.
 
-## Obiettivo
+## Modifiche v0.3
+- Approvata la baseline RBAC D-021.
+- Chiariti i confini del Super Admin: provisioning e gestione del ciclo di vita dei tenant, senza accesso operativo ordinario ai dati delle palestre.
+- Confermato il perimetro del Gym Admin, Instructor e Member.
+- Mantenute aperte le decisioni sui permessi di creazione/modifica lezioni da parte dell'Instructor (Q-022) e sulle azioni amministrative puntuali del Gym Admin su prenotazioni/lista d'attesa (Q-023).
 
-Realizzare una piattaforma utilizzabile da più palestre indipendenti, con separazione dei dati e dei permessi. Gli operatori della palestra amministrano le attività; gli iscritti consultano il calendario e prenotano le lezioni attraverso un'interfaccia dedicata.
-
-## Funzionalità previste
-
-- Gestione di più palestre (multi-tenancy).
-- Gestione di utenti e ruoli.
-- Gestione di istruttori, corsi e lezioni.
-- Calendario delle lezioni.
-- Prenotazioni, cancellazioni e lista d'attesa.
-- Registrazione di presenze e assenze.
-- Configurazione delle tipologie di abbonamento da parte di ciascuna palestra.
-
-Le funzionalità elencate sono in fase di definizione: consultare il PRD e lo Scope per distinguere requisiti confermati, proposte e questioni aperte.
-
-## Stack tecnologico proposto
-
-| Componente | Tecnologia | Stato |
-|---|---|---|
-| Frontend | React + TypeScript + Vite | Proposta da confermare in fase di progettazione tecnica |
-| Backend | Java 21 + Spring Boot | Proposta da confermare in fase di progettazione tecnica |
-| Database | PostgreSQL | Proposta da confermare in fase di progettazione tecnica |
-| API | REST | Direzione proposta |
-| Security | Spring Security | Proposta da confermare in fase di progettazione tecnica |
-| Mini App integration | `@gemspace/gem-bridge-sdk` | SDK individuato; integrazione da validare |
-| Frontend testing | Vitest + React Testing Library | Proposta |
-| Backend testing | JUnit + Mockito | Proposta |
-| Versionamento | Git + GitHub | Strumenti previsti |
-| Containerizzazione | Docker | Da valutare durante il setup |
-
-## Documentazione
-
-| Documento | Descrizione |
-|---|---|
-| [PRODUCT_VISION.md](docs/product/PRODUCT_VISION.md) | Visione del prodotto |
-| [PRD.md](docs/product/PRD.md) | Requisiti del prodotto |
-| [SCOPE.md](docs/product/SCOPE.md) | Perimetro dell'MVP |
-| [GLOSSARY.md](docs/product/GLOSSARY.md) | Glossario |
-| [DECISIONS_AND_OPEN_QUESTIONS.md](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md) | Decisioni e questioni aperte |
-
-## Struttura del repository prevista
-
-```text
-Fitora/
-|
-├──backend/
-|
-├──frontend/
-│
-├── docs/
-│   ├── product/
-│   │   ├── PRODUCT_VISION.md
-│   │   ├── PRD.md
-│   │   ├── SCOPE.md
-│   │   └── GLOSSARY.md
-│   │
-│   ├── project/
-│   │   └── DECISIONS_AND_OPEN_QUESTIONS.md
-│   │
-│   └── architecture/
-│       └── .gitkeep
-│
-├── .gitignore
-└── README.md
-```
-
-La struttura è indicativa e potrà cambiare dopo la progettazione dell'architettura.
-
-## Gem Space
-
-Il frontend è destinato a essere integrato nell'ecosistema Gem Space tramite `@gemspace/gem-bridge-sdk`. Il README dello SDK indica l'uso di `bridge.app.init()`, `bridge.profile.get()`, `bridge.auth.getToken()` e `bridge.app.ready()`. Il token JWT fornito da Gem Space deve essere verificato lato backend. Prima di implementare l'autenticazione occorre consultare le istruzioni ufficiali complete per chiavi e parametri di validazione.
-
-## Come leggere questa documentazione
-
-- **Confermato:** scelta espressa durante la Product Discovery.
-- **Proposto:** soluzione suggerita per costruire la prima versione, da approvare.
-- **Da definire (TBD):** informazione ancora necessaria prima di fissare requisiti o modello dati.
-
-Per le decisioni ancora aperte, fare riferimento alla sezione 11 del `PRD.md`.
+Le decisioni sono soggette alla successiva validazione con una palestra cliente. Le questioni marcate TBD non devono essere implementate come comportamenti definitivi.

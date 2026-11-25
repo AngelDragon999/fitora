@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | 0.2 — Draft aggiornato |
+| Versione | 0.3 — Draft aggiornato |
 | Data aggiornamento | 25 novembre 2026 |
 | Stato | Requisiti aggiornati sulla base della discovery; restano questioni aperte da validare |
 | Product owner | Da assegnare |
@@ -36,10 +36,10 @@ La piattaforma deve consentire a più palestre indipendenti di operare nello ste
 
 | Attore | Descrizione | Stato |
 |---|---|---|
-| Super Admin | Gestisce la piattaforma nel suo complesso e il ciclo di vita delle palestre. | Ruolo confermato; perimetro operativo dettagliato da validare. |
-| Gym Admin | Gestisce una specifica palestra, gli utenti e la configurazione operativa. | Ruolo confermato; matrice permessi proposta più avanti e da validare. |
-| Instructor | Istruttore associato a una palestra, conduce le lezioni e registra le presenze autorizzate. | Ruolo confermato; permessi ulteriori da validare. |
-| Member | Iscritto a una o più palestre; consulta il calendario e gestisce le proprie prenotazioni. | Ruolo confermato. |
+| Super Admin | Gestisce la piattaforma nel suo complesso e il ciclo di vita delle palestre. | Ruolo globale confermato: gestisce il ciclo di vita delle palestre e il provisioning; nessun accesso ordinario ai dati operativi delle singole palestre. |
+| Gym Admin | Gestisce una specifica palestra, gli utenti e la configurazione operativa. | Ruolo confermato; amministra esclusivamente la propria palestra secondo la matrice RBAC approvata. |
+| Instructor | Istruttore associato a una palestra, conduce le lezioni e registra le presenze autorizzate. | Ruolo confermato; consulta le lezioni assegnate e registra le presenze autorizzate. La possibilità di creare/modificare lezioni resta da decidere. |
+| Member | Iscritto a una o più palestre; consulta il calendario e gestisce le proprie prenotazioni. | Ruolo confermato; opera sui propri dati, sulle proprie prenotazioni e sui servizi pubblicati dalle palestre a cui è associato. |
 
 Le autorizzazioni devono essere contestuali alla palestra. I ruoli assegnati a un utente nell'ambito di una palestra non devono attribuire automaticamente gli stessi privilegi presso un'altra palestra. Il ruolo Super Admin è invece globale.
 
@@ -99,29 +99,39 @@ Le priorità sono:
 | FR-USR-005 | Il Gym Admin deve poter creare manualmente un profilo Member nella propria palestra. | Must | Confermato per l'MVP. |
 | FR-USR-006 | Il sistema deve collegare il profilo Fitora creato dal Gym Admin all'identità Gem Space dell'iscritto. | Must | Obiettivo confermato; procedura sicura di associazione ancora TBD. |
 
-#### 5.2.1 Matrice iniziale dei permessi — proposta da validare
+#### 5.2.1 Matrice RBAC — baseline approvata per l'MVP
 
-La seguente matrice è una base di lavoro, non una decisione definitiva sui permessi.
+La seguente matrice è stata approvata come baseline funzionale per l'MVP. I permessi sono applicati lato backend e, salvo il Super Admin, sono sempre circoscritti alla palestra associata tramite `GymMembership`.
 
 | Operazione | Super Admin | Gym Admin | Instructor | Member |
 |---|---|---|---|---|
-| Gestire le palestre e il provisioning | Sì, globale | No | No | No |
-| Consultare i dati operativi di una palestra | Solo secondo una policy globale da definire | Sì, propria palestra | Dati necessari alle lezioni assegnate | Solo i propri dati e le informazioni pubblicate |
-| Creare/modificare corsi e lezioni | Supporto globale da definire | Sì, propria palestra | TBD | No |
-| Gestire iscritti e istruttori | No, salvo policy globale | Sì, propria palestra | No, salvo futura delega | Gestione del solo profilo personale da definire |
-| Creare/assegnare piani di abbonamento | No, salvo amministrazione piattaforma | Sì, propria palestra | No | No |
-| Consultare e gestire le proprie prenotazioni | No | Consultazione/gestione per la palestra | Consultazione delle lezioni assegnate | Sì, proprie prenotazioni |
-| Entrare/uscire dalla lista d'attesa e confermare un'offerta | No | Consultazione/gestione per la palestra da definire | No | Sì, per sé |
-| Registrare presenza/assenza | No, salvo supporto globale autorizzato | Sì, propria palestra | Sì, per le lezioni autorizzate | No |
-| Consultare il proprio abbonamento | No | Sì, per gli iscritti della propria palestra | No, salvo delega | Sì |
+| Creare, attivare, sospendere e gestire il ciclo di vita delle palestre | Sì, globale | No | No | No |
+| Eseguire provisioning della palestra e assegnare il primo Gym Admin | Sì, globale | No | No | No |
+| Consultare i dati operativi della palestra (iscritti, prenotazioni, abbonamenti) | No, non nell'operatività ordinaria | Sì, propria palestra | Solo le informazioni necessarie alle lezioni assegnate | Solo i propri dati e le informazioni pubblicate |
+| Creare/modificare corsi | No | Sì, propria palestra | No nell'MVP | No |
+| Creare/modificare lezioni | No | Sì, propria palestra | TBD: decisione specifica ancora aperta (Q-022) | No |
+| Gestire iscritti e istruttori | No, salvo gestione dell'account del Gym Admin nell'ambito del provisioning | Sì, propria palestra | No | No; può consultare/aggiornare solo i campi del proprio profilo che saranno autorizzati |
+| Creare/modificare piani e assegnare abbonamenti | No | Sì, propria palestra | No | No |
+| Consultare e gestire prenotazioni | No | Consultazione e gestione amministrativa nella propria palestra; azioni puntuali da specificare | Consultazione delle lezioni assegnate e delle relative informazioni operative | Sì, proprie prenotazioni |
+| Entrare/uscire dalla lista d'attesa e confermare/rifiutare un'offerta | No | Consultazione/gestione amministrativa nella propria palestra; azioni puntuali da specificare | No | Sì, per sé |
+| Registrare presenza/assenza | No | Sì, propria palestra | Sì, per le lezioni autorizzate | No |
+| Consultare il proprio abbonamento | No | Sì, per gli iscritti della propria palestra | No | Sì, il proprio |
 
-> **Vincolo di sicurezza:** nessuna schermata o controllo frontend sostituisce l'autorizzazione backend. La palestra attiva deve essere ricavata da un contesto autenticato e autorizzato, non accettata ciecamente da un parametro fornito dal client.
+**Confini del Super Admin.** Il Super Admin ha privilegi globali limitati all'amministrazione della piattaforma: gestione del ciclo di vita dei tenant, provisioning e assegnazione del primo Gym Admin. Non dispone di accesso ordinario ai dati personali e operativi delle singole palestre (iscritti, prenotazioni, presenze e abbonamenti). Eventuali accessi eccezionali per assistenza non fanno parte dei permessi ordinari dell'MVP e richiederebbero una policy separata, autorizzazione e tracciamento.
+
+**Confini del Gym Admin.** Il Gym Admin amministra la propria palestra e non può accedere ai dati o alle operazioni di altri tenant.
+
+**Confini dell'Instructor.** L'Instructor consulta le lezioni a cui è assegnato e le informazioni necessarie alla conduzione della lezione; può registrare presenza/assenza per le lezioni per cui è autorizzato. La creazione o modifica delle lezioni resta TBD (Q-022).
+
+**Confini del Member.** Il Member può operare esclusivamente sul proprio profilo, sulle proprie prenotazioni, sulla propria posizione in lista d'attesa e consultare il proprio abbonamento e le informazioni pubblicate dalla palestra.
+
+> **Vincolo di sicurezza:** nessuna schermata o controllo frontend sostituisce l'autorizzazione backend. Il contesto palestra deve derivare da una membership autenticata e autorizzata, non essere accettato ciecamente da un parametro fornito dal client. I controlli devono essere verificati anche con test negativi cross-tenant.
 
 ### 5.3 Corsi, lezioni e istruttori
 
 | ID | Requisito | Priorità | Stato / Note |
 |---|---|---|---|
-| FR-CLS-001 | Un utente autorizzato della palestra deve poter creare e modificare le lezioni. | Must | Gym Admin previsto; permessi di creazione/modifica dell'Instructor da validare. |
+| FR-CLS-001 | Un utente autorizzato della palestra deve poter creare e modificare le lezioni. | Must | Gym Admin autorizzato; creazione/modifica da parte dell'Instructor ancora TBD (Q-022). |
 | FR-CLS-002 | Ogni corso e lezione devono essere associati a una palestra. | Must | Confermato dal modello multi-tenant. |
 | FR-CLS-003 | Una lezione deve contenere almeno attività/corso, data, orario di inizio e fine o durata, istruttore e capienza massima. | Must | Campi minimi proposti; durata vs orario finale da uniformare nel design. |
 | FR-CLS-004 | Il sistema deve mostrare agli iscritti le lezioni pubblicate e disponibili della propria palestra. | Must | Confermato come flusso. |
@@ -313,7 +323,6 @@ Le seguenti questioni non sono state ancora approvate come requisiti definitivi 
 | Q-009 | Decidere se l'MVP gestisce solo lezioni singole o anche la creazione di serie ricorrenti. | Modello Course/Lesson, calendario e UX. | Prima del database design. |
 | Q-011 | Definire il canale che rende tempestivamente visibile un'offerta di lista d'attesa con scadenza di 30 minuti. | Fattibilità del flusso waiting list e dipendenze Gem Space. | Prima di implementare la waiting list. |
 | Q-012 | Verificare requisiti, limiti, documentazione di autenticazione e processo di pubblicazione delle Mini App Gem Space. | Dipendenza esterna, sicurezza e rilascio. | Prima dell'integrazione e pubblicazione. |
-| Q-013 | Validare la matrice dei permessi proposta per Super Admin, Gym Admin, Instructor e Member. | RBAC, API e sicurezza. | Prima di implementare Spring Security. |
 | Q-014 | Definire il provisioning della palestra e la creazione/assegnazione del primo Gym Admin. | Onboarding tenant e amministrazione globale. | Prima del flusso di onboarding. |
 | Q-015 | Definire l'effetto di cancellazione tardiva e No-show sugli abbonamenti temporali, che non hanno un contatore di crediti. | Regole di business e consistenza degli abbonamenti. | Prima della subscription logic. |
 | Q-016 | Definire se un iscritto può avere più abbonamenti attivi nella stessa palestra e quale viene utilizzato per una prenotazione. | Selezione piano, consumo crediti e modello dati. | Prima del database design. |
@@ -322,6 +331,8 @@ Le seguenti questioni non sono state ancora approvate come requisiti definitivi 
 | Q-019 | Definire gli stati e le regole di attivazione/disattivazione di GymMembership. | Autorizzazioni e ciclo di vita dell'utente. | Prima del database design. |
 | Q-020 | Definire i casi in cui il personale può correggere una presenza già registrata e le relative regole di audit. | Tracciabilità e gestione operativa. | Prima del modulo presenze. |
 | Q-021 | Definire se l'interfaccia amministrativa per Gym Admin e Instructor sarà una console web separata, la stessa Mini App o un diverso canale. | Architettura frontend, UX, autenticazione e scope. | Prima della progettazione UX/architetturale. |
+| Q-022 | Decidere se l'Instructor può creare o modificare lezioni oppure soltanto consultare quelle assegnate e registrare le presenze. | Permessi applicativi, API e interfaccia amministrativa. | Prima di implementare le relative operazioni. |
+| Q-023 | Specificare le azioni amministrative del Gym Admin sulle prenotazioni e sulla lista d'attesa (ad esempio cancellazioni per conto dell'iscritto o interventi manuali). | Regole operative, audit e API. | Prima di implementare le funzioni amministrative. |
 
 ## 11. Cronologia delle revisioni
 
@@ -329,3 +340,4 @@ Le seguenti questioni non sono state ancora approvate come requisiti definitivi 
 |---|---|---|
 | 0.1 | 17/11/2026 | Prima bozza della discovery. |
 | 0.2 | 25/11/2026 | Consolidate le decisioni su cancellazioni, lista d'attesa, abbonamenti, consumo crediti, presenze, multi-gym, onboarding amministrativo e autenticazione Gem Space; aggiunte proposte RBAC e questioni aperte tracciate. |
+| 0.3 | 25/11/2026 | Approvata la baseline RBAC D-021; chiariti i confini del Super Admin e mantenute aperte le decisioni di dettaglio Q-022 e Q-023. |
